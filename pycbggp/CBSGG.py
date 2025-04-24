@@ -65,6 +65,14 @@ class VarTree:
  def __init__(self, G):
   self.G = G  
    
+ def AddEdge(self, e):
+  return 
+ def RemoveEdge(self, e):
+  return 
+ def ReplaceEdge(self, eIn, eOut):
+  # replace edge eOut of current tree by another edge eIn 
+  return 
+  
 class Weight:
  '''
  object representing the weight of a VarTree vt 
