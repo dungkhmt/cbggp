@@ -20,42 +20,95 @@ class Node:
   return '' + str(self.id)
   
 class Edge:
- def __init__(self,fromNode, toNode):
-  self.fromNode = fromNode 
-  self.toNode = toNode 
+ def __init__(self, u, v):
+  self.u = u 
+  self.v = v 
  
  def toStr(self):
   return '(' + self.fromNode.toStr() + ',' + self.toNode.toStr() + ')' 
   
 class Graph:
- def __init__(self, nodes):
+ def __init__(self, nodes, sizeOfAdj):
+  self.numberNodes = len(nodes)
   self.nodes = nodes 
-  self.Adj = {} #adjacent edges
-  for v in nodes:
-   self.Adj[v] = []
-   
- def AddEdge(self, e):
-  self.Adj[e.fromNode].append(e)
-  self.Adj[e.toNode].append(e)
+  self.Adj = [[] for _ in range(sizeOfAdj)] #adjacent edges
+  self.edges = [] #edges of the graph
+  self.numberEdges = 0
+
+ def AddEdge(self, newEdge):
+  id = self.numberEdges
+  self.Adj[newEdge.u].append(id)
+  self.Adj[newEdge.v].append(id)
+  self.edges.append(newEdge)
+  self.numberEdges += 1
   
  def Print(self):
   print('Nodes = ',end = ' ')
   for v in self.nodes:
-   print(v.toStr(),end = ' ')  
+   print(str(v), end = ' ')  
   print('')
-  for n in self.nodes:
-   print('Adj[' + n.toStr() + ']: ',end = ' ')
-   
-   for e in self.Adj[n]:
-    print(e.toStr(), end = ' ')
-   print('') 
+  for u in range(len(self.Adj)):
+    if len(self.Adj[u]) == 0:
+      continue
+    print('Adj[' + str(u) + ']: ', end = ' ')
+    for id in self.Adj[u]:
+      v = self.edges[id].u + self.edges[id].v - u
+      print(v, end = ' ')
+    print('') 
    
    
 class SubGraphGenerator:
  def __init__(self,G):
   self.G = G 
  def GenGraph(self, nbNodes, nbEdges):
-  return 
+  # generate all connected graph with nbNodes and nbEdges with m <= 20
+  listGraph = []
+  for mask in range(1, 1 << self.G.numberEdges):
+    # check if the graph is connected
+    # check if the number of nodes is nbNodes and number of edges is nbEdges
+    if int.bit_count(mask) != nbEdges:
+      continue
+    visited = [False] * self.G.numberNodes
+    listNodesCurrent = []
+    for id in range(self.G.numberEdges):
+      if mask & (1 << id):
+        if not visited[self.G.edges[id].u]:
+          listNodesCurrent.append(self.G.edges[id].u)
+          visited[self.G.edges[id].u] = True
+        if not visited[self.G.edges[id].v]:
+          listNodesCurrent.append(self.G.edges[id].v)
+          visited[self.G.edges[id].v] = True
+    if len(listNodesCurrent) != nbNodes:
+      continue
+    # check if the graph is connected
+    visited = [False] * self.G.numberNodes
+    checkConnected = True
+    for u in listNodesCurrent:
+      if not visited[u]:
+        ans = self.dfs(u, mask, visited)
+        if ans != len(listNodesCurrent):
+          checkConnected = False
+          break
+    if not checkConnected:
+      continue
+    # add the graph to the list
+    GMask = Graph(listNodesCurrent, self.G.numberNodes)
+    for id in range(self.G.numberEdges):
+      if mask & (1 << id):
+        GMask.AddEdge(self.G.edges[id])
+    listGraph.append(GMask)
+  return listGraph
+ 
+ def dfs(self, u, mask, visited):
+  visited[u] = True
+  ans = 1
+  for id in self.G.Adj[u]:
+    if not (mask & (1 << id)):
+      continue
+    v = self.G.edges[id].u + self.G.edges[id].v - u
+    if not visited[v]:
+      ans += self.dfs(v, mask, visited)
+  return ans
  
 class VarTree:
  '''
@@ -131,13 +184,18 @@ class VarPath:
 n = 5   
 nodes = []
 for i in range(n):
- nod = Node(i)
- nodes.append(nod)
+ nodes.append(i)
 
-G = Graph(nodes)
-G.AddEdge(Edge(nodes[0],nodes[1]))
-G.AddEdge(Edge(nodes[0],nodes[2]))
-G.AddEdge(Edge(nodes[1],nodes[3]))
-G.AddEdge(Edge(nodes[2],nodes[4]))
+G = Graph(nodes, n)
+G.AddEdge(Edge(0, 1))
+G.AddEdge(Edge(0, 2))
+G.AddEdge(Edge(1, 3))
+G.AddEdge(Edge(2, 4))
 
-G.Print() 
+GraphGenerator = SubGraphGenerator(G)
+listGraph = GraphGenerator.GenGraph(3, 2)
+# print all subgraphs generated
+for i in range(len(listGraph)):
+  g = listGraph[i]
+  g.Print()
+  print('')
