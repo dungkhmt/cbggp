@@ -1,0 +1,1 @@
+Branch and bound algorithm for max-clique
