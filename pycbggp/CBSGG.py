@@ -85,7 +85,33 @@ class Graph:
    f.write(line)
   f.close() 
   return  
-  
+
+class DirectedGraph(Graph):
+ def __init__(self, n : int):
+  super().__init__(n)
+
+ def AddEdge(self, fromNode : int, toNode : int, weight : int = 0):
+  e = Edge(fromNode, toNode, self.m, weight)
+  self.Adj[fromNode].append(self.m)
+  self.edges.append(e)
+  self.m += 1
+
+ def AddEdge1(self, e : Edge):
+  self.Adj[e.fromNode].append(self.m)
+  self.edges.append(e)
+  self.m += 1
+
+ def Print(self):
+  print('Nodes = ',end = ' ')
+  for v in range(self.n):
+   print(v,end = ' ')
+  print('')
+  for n in range(self.n):
+   print('Adj[' + str(n) + ']: ',end = ' ')
+   
+   for e in self.Adj[n]:
+    print(self.edges[e].toStr(), end = ' ')
+   print('')
    
 class SubGraphGenerator:
  def __init__(self,G):
@@ -184,3 +210,10 @@ G.AddEdge(1,3)
 G.AddEdge(2,4)
 
 G.Print() 
+
+G1 = DirectedGraph(n)
+G1.AddEdge(0,1)
+G1.AddEdge(0,2)
+G1.AddEdge(1,3)
+G1.AddEdge(2,4)
+G1.Print()
