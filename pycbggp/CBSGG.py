@@ -1,5 +1,7 @@
-import sys 
-import random as rd 
+﻿import sys
+import random as rd
+from collections import defaultdict
+from typing import Dict, Iterable, List, Optional, Union
 
 '''
 Problems: generate a subgraph/subtree of a given graph with some properties:
@@ -13,50 +15,68 @@ Problems: generate a subgraph/subtree of a given graph with some properties:
   - contains NO bridges
   etc.
 '''
-class Node:
- def __init__(self,id):
-  self.id = id 
- def toStr(self):
-  return '' + str(self.id)
+# class Node:
+#  def __init__(self,id):
+#   self.id = id 
+#  def toStr(self):
+#   return '' + str(self.id)
   
 class Edge:
- def __init__(self,fromNode, toNode):
+ def __init__(self,fromNode : int, toNode : int, id : int, weight : int = 0):
   self.fromNode = fromNode 
   self.toNode = toNode 
-  self.weight = 0
- 
+  self.weight = weight
+  self.id = id
+
  def toStr(self):
-  return '(' + self.fromNode.toStr() + ',' + self.toNode.toStr() + ')' 
-  
+  return '(' + str(self.fromNode) + ',' + str(self.toNode) + ')' 
+
 class Graph:
  '''
     TO BE DONE by Nguyen Tan Dung
     maintain: a list of edges E 
                A[v] is the list of indices of adjacent (outgoing) edges 
  '''
- def __init__(self, nodes):
-  self.nodes = nodes 
-  self.Adj = {} #adjacent edges
-  for v in nodes:
-   self.Adj[v] = []
-   
- def AddEdge(self, e):
-  self.Adj[e.fromNode].append(e)
-  self.Adj[e.toNode].append(e)
-  
+ # def __init__(self, nodes):
+ #  self.nodes = nodes 
+ #  self.Adj = {} #adjacent edges
+ #  for v in nodes:
+ #   self.Adj[v] = []
+ def __init__(self, n : int):
+  self.n = n 
+  self.edges : list[Edge] = []
+  self.Adj : list[list[int]] = [[] for _ in range(n)]
+  self.m = 0
+
+ def AddEdge(self, fromNode : int, toNode : int, weight : int = 0):
+  e = Edge(fromNode, toNode, self.m, weight)
+  self.Adj[fromNode].append(self.m)
+  self.Adj[toNode].append(self.m)
+  self.edges.append(e)
+  self.m += 1
+
+ def AddEdge1(self, e : Edge):
+  self.Adj[e.fromNode].append(self.m)
+  self.Adj[e.toNode].append(self.m)
+  self.edges.append(e)
+  self.m += 1
+
  def Print(self):
   print('Nodes = ',end = ' ')
-  for v in self.nodes:
-   print(v.toStr(),end = ' ')  
+  for v in range(self.n):
+   print(v,end = ' ')
+  # for v in self.nodes:
+  #  print(v.toStr(),end = ' ')  
   print('')
-  for n in self.nodes:
-   print('Adj[' + n.toStr() + ']: ',end = ' ')
+  # for n in self.nodes:
+  #  print('Adj[' + n.toStr() + ']: ',end = ' ')
+  for n in range(self.n):
+   print('Adj[' + str(n) + ']: ',end = ' ')
    
    for e in self.Adj[n]:
-    print(e.toStr(), end = ' ')
+    print(self.edges[e].toStr(), end = ' ')
    print('') 
-   
-   
+
 class SubGraphGenerator:
  def __init__(self,G):
   self.G = G 
@@ -135,15 +155,22 @@ class VarPath:
   
 # main test...   
 n = 5   
-nodes = []
-for i in range(n):
- nod = Node(i)
- nodes.append(nod)
+# nodes = []
+# for i in range(n):
+#  nod = Node(i)
+#  nodes.append(nod)
 
-G = Graph(nodes)
-G.AddEdge(Edge(nodes[0],nodes[1]))
-G.AddEdge(Edge(nodes[0],nodes[2]))
-G.AddEdge(Edge(nodes[1],nodes[3]))
-G.AddEdge(Edge(nodes[2],nodes[4]))
+# G = Graph(nodes)
+
+G = Graph(n)
+# G.AddEdge(Edge(nodes[0],nodes[1]))
+# G.AddEdge(Edge(nodes[0],nodes[2]))
+# G.AddEdge(Edge(nodes[1],nodes[3]))
+# G.AddEdge(Edge(nodes[2],nodes[4]))
+
+G.AddEdge(0,1)
+G.AddEdge(0,2)
+G.AddEdge(1,3)
+G.AddEdge(2,4)
 
 G.Print() 
