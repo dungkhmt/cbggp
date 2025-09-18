@@ -23,11 +23,17 @@ class Edge:
  def __init__(self,fromNode, toNode):
   self.fromNode = fromNode 
   self.toNode = toNode 
+  self.weight = 0
  
  def toStr(self):
   return '(' + self.fromNode.toStr() + ',' + self.toNode.toStr() + ')' 
   
 class Graph:
+ '''
+    TO BE DONE by Nguyen Tan Dung
+    maintain: a list of edges E 
+               A[v] is the list of indices of adjacent (outgoing) edges 
+ '''
  def __init__(self, nodes):
   self.nodes = nodes 
   self.Adj = {} #adjacent edges
