@@ -1,4 +1,4 @@
-import sys
+
 '''
     Generate graphs under constraints
     -connected undirected graph with n nodes and m edges and k bridges
@@ -10,6 +10,9 @@ import sys
     ...
 '''
 
+import sys
+from PlanarGraphGenerator import PlanarGraphGenerator
+
 def generateConnectedSubgraph():
  return None 
  
@@ -19,8 +22,11 @@ if __name__ == "__main__":
  connected = 'Y'
  nbNodes = 0
  nbEdges = 0
+ nbBridges = 0
+ maxDegree = 10
  gType = 'planar'
  directed = 'N' 
+ filename = 'g.txt'
  for i in range(len(sys.argv)):
   #print('argv[',i,'] = ',sys.argv[i]) 
   if sys.argv[i] == '-connected':
@@ -32,5 +38,18 @@ if __name__ == "__main__":
   elif sys.argv[i] == '-type':
    gType = sys.argv[i+1]
   elif sys.argv[i] == '-directed':
-   directed = sys.argv[i+1]  
+   directed = sys.argv[i+1] 
+  elif sys.argv[i] == '-nbBridges':
+   nbBridges = int(sys.argv[i+1])
+  elif sys.argv[i] == '-maxDegree':
+   maxDegree = int(sys.argv[i+1]) 
+  elif sys.argv[i] == '-filename':
+   filename = int(sys.argv[i+1])
+   
  
+ if gType == 'planar':
+  PGG = PlanarGraphGenerator()
+  G = PGG.Generate(nbNodes, nbEdges, nbBridges,maxDegree)
+  G.Print()
+  G.SaveToFile(filename)
+  

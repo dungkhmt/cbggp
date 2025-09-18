@@ -77,6 +77,16 @@ class Graph:
     print(self.edges[e].toStr(), end = ' ')
    print('') 
 
+ def SaveToFile(self, filename):
+  with open(filename,'w') as f:
+   line = ''
+   for node in self.nodes:
+    line = line + str(node.id) + ' '
+   f.write(line)
+  f.close() 
+  return  
+  
+   
 class SubGraphGenerator:
  def __init__(self,G):
   self.G = G 
