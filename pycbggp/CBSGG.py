@@ -86,6 +86,12 @@ class Graph:
   f.close() 
   return  
 
+  def copy(self):
+   G = Graph(self.nodes)
+   for e in self.edges:
+    G.AddEdge1(e)
+   return G
+
 class DirectedGraph(Graph):
  def __init__(self, n : int):
   super().__init__(n)
@@ -112,6 +118,12 @@ class DirectedGraph(Graph):
    for e in self.Adj[n]:
     print(self.edges[e].toStr(), end = ' ')
    print('')
+  
+  def copy(self):
+   G = DirectedGraph(self.n)
+   for e in self.edges:
+    G.AddEdge1(e)
+   return G
    
 class SubGraphGenerator:
  def __init__(self,G):
