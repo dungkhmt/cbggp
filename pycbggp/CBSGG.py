@@ -61,6 +61,15 @@ class Graph:
   self.edges.append(e)
   self.m += 1
 
+ def PopEdge(self):
+  if self.m == 0:
+   return None 
+  e = self.edges.pop()
+  self.Adj[e.fromNode].pop()
+  self.Adj[e.toNode].pop()
+  self.m -= 1
+  return e
+
  def Print(self):
   print('Nodes = ',end = ' ')
   for v in range(self.n):
@@ -70,6 +79,12 @@ class Graph:
   print('')
   # for n in self.nodes:
   #  print('Adj[' + n.toStr() + ']: ',end = ' ')
+
+  print('Edges = ',end = ' ')
+  for e in self.edges:
+   print(e.toStr(),end = ' ')
+  print('')
+
   for n in range(self.n):
    print('Adj[' + str(n) + ']: ',end = ' ')
    
@@ -86,11 +101,11 @@ class Graph:
   f.close() 
   return  
 
-  def copy(self):
-   G = Graph(self.nodes)
-   for e in self.edges:
-    G.AddEdge1(e)
-   return G
+ def copy(self):
+  G = Graph(self.n)
+  for e in self.edges:
+   G.AddEdge1(e)
+  return G
 
 class DirectedGraph(Graph):
  def __init__(self, n : int):
@@ -107,11 +122,25 @@ class DirectedGraph(Graph):
   self.edges.append(e)
   self.m += 1
 
+ def PopEdge(self):
+  if self.m == 0:
+   return None 
+  e = self.edges.pop()
+  self.Adj[e.fromNode].pop()
+  self.m -= 1
+  return e
+
  def Print(self):
   print('Nodes = ',end = ' ')
   for v in range(self.n):
    print(v,end = ' ')
   print('')
+
+  print('Edges = ',end = ' ')
+  for e in self.edges:
+   print(e.toStr(),end = ' ')
+  print('')
+
   for n in range(self.n):
    print('Adj[' + str(n) + ']: ',end = ' ')
    
@@ -119,11 +148,11 @@ class DirectedGraph(Graph):
     print(self.edges[e].toStr(), end = ' ')
    print('')
   
-  def copy(self):
-   G = DirectedGraph(self.n)
-   for e in self.edges:
-    G.AddEdge1(e)
-   return G
+ def copy(self):
+  G = DirectedGraph(self.n)
+  for e in self.edges:
+   G.AddEdge1(e)
+  return G
    
 class SubGraphGenerator:
  def __init__(self,G):
@@ -202,30 +231,30 @@ class VarPath:
   self.t = t 
   
 # main test...   
-n = 5   
-# nodes = []
-# for i in range(n):
-#  nod = Node(i)
-#  nodes.append(nod)
+# n = 5   
+# # nodes = []
+# # for i in range(n):
+# #  nod = Node(i)
+# #  nodes.append(nod)
 
-# G = Graph(nodes)
+# # G = Graph(nodes)
 
-G = Graph(n)
-# G.AddEdge(Edge(nodes[0],nodes[1]))
-# G.AddEdge(Edge(nodes[0],nodes[2]))
-# G.AddEdge(Edge(nodes[1],nodes[3]))
-# G.AddEdge(Edge(nodes[2],nodes[4]))
+# G = Graph(n)
+# # G.AddEdge(Edge(nodes[0],nodes[1]))
+# # G.AddEdge(Edge(nodes[0],nodes[2]))
+# # G.AddEdge(Edge(nodes[1],nodes[3]))
+# # G.AddEdge(Edge(nodes[2],nodes[4]))
 
-G.AddEdge(0,1)
-G.AddEdge(0,2)
-G.AddEdge(1,3)
-G.AddEdge(2,4)
+# G.AddEdge(0,1)
+# G.AddEdge(0,2)
+# G.AddEdge(1,3)
+# G.AddEdge(2,4)
 
-G.Print() 
+# G.Print() 
 
-G1 = DirectedGraph(n)
-G1.AddEdge(0,1)
-G1.AddEdge(0,2)
-G1.AddEdge(1,3)
-G1.AddEdge(2,4)
-G1.Print()
+# G1 = DirectedGraph(n)
+# G1.AddEdge(0,1)
+# G1.AddEdge(0,2)
+# G1.AddEdge(1,3)
+# G1.AddEdge(2,4)
+# G1.Print()
