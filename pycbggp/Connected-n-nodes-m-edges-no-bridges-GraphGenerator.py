@@ -126,8 +126,8 @@ class ConnectedGraphWithoutBridgeGenerator:
 
     return self.graphs
 
-n = 4
-m = 5
+n = 8
+m = 14
 CG = ConnectedGraphWithoutBridgeGenerator()
 Gs = CG.Generate(n, m)
 for G in Gs:
