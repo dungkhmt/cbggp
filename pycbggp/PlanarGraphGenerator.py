@@ -173,21 +173,25 @@ class PlanarGraphGenerator:
     
     random.shuffle(edges)
     dsu = DSU(n)
-    added = [False for _ in range(len(edges))]
-    for (i, e) in enumerate(edges):
+    for i in range(n):
+      for j in range(n):
+        mat[i][j] = mat[j][i] = False
+
+    for e in edges:
       if dsu.union(e[0], e[1]):
         G.AddEdge(e[0], e[1])
-        added[i] = True
+        mat[e[0]][e[1]] = True
+        mat[e[1]][e[0]] = True
         if dsu.ncc == 1:
           print('connected')
           break
 
     cnt = m - n + 1
     random.shuffle(edges)
-    for (i, e) in enumerate(edges):
+    for e in edges:
       if cnt == 0:
         break
-      if added[i] == False:
+      if mat[e[0]][e[1]] == False:
         G.AddEdge(e[0], e[1])
         cnt -= 1
 
@@ -201,7 +205,7 @@ G.Print()
 '''
 
 PG = PlanarGraphGenerator()
-G = PG.Generate(20, 30, 5, 10)
+G = PG.Generate(50, 100, 1, 6)
 if G != None:
   G.Print()
   G.PrintUnweighted()
