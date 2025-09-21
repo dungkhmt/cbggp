@@ -63,6 +63,12 @@ class Graph:
     self.Adj[e.toNode].append(self.m)
     self.edges.append(e)
     self.m += 1
+  
+  def addFromAdj(self, adj : list[list[int]]):
+    for u in range(self.n):
+      for v in adj[u]:
+        if u < v:
+          self.AddEdge(u,v)
 
   def PopEdge(self):
     if self.m == 0:
@@ -95,15 +101,15 @@ class Graph:
         print(self.edges[e].toStr(), end=' ')
       print('')
 
-  def PrintWeighted(self):
+  def PrintWeighted(self, offset = 0):
     print(self.n, self.m)
     for e in self.edges:
-      print(e.fromNode, e.toNode, e.weight)
+      print(e.fromNode + offset, e.toNode + offset, e.weight)
 
-  def PrintUnweighted(self):
+  def PrintUnweighted(self, offset = 0):
     print(self.n, self.m)
     for e in self.edges:
-      print(e.fromNode, e.toNode)
+      print(e.fromNode + offset, e.toNode + offset)
 
   def SaveToFile(self, filename):
     with open(filename, 'w') as f:
@@ -162,15 +168,20 @@ class DirectedGraph(Graph):
         print(self.edges[e].toStr(), end=' ')
       print('')
 
-  def PrintWeighted(self):
+  def PrintWeighted(self, offset = 0):
     print(self.n, self.m)
     for e in self.edges:
-      print(e.fromNode, e.toNode, e.weight)
+      print(e.fromNode + offset, e.toNode + offset, e.weight)
 
-  def PrintUnweighted(self):
+  def PrintUnweighted(self, offset = 0):
     print(self.n, self.m)
     for e in self.edges:
-      print(e.fromNode, e.toNode)
+      print(e.fromNode + offset, e.toNode + offset)
+
+  def addFromAdj(self, adj : list[list[int]]):
+    for u in range(self.n):
+      for v in adj[u]:
+        self.AddEdge(u,v)
 
   def copy(self):
     G = DirectedGraph(self.n)

@@ -1,6 +1,7 @@
 import random
 import math
 from CBSGG import Graph
+from functools import cmp_to_key
 
 # from CBSGG import Node 
 from CBSGG import Edge
@@ -85,10 +86,36 @@ class PlanarGraphGenerator:
       return True
 
     return False
+  
+  def ccw(self, A, B, C):
+    # val = (B[1] - A[1]) * (C[0] - B[0]) - (B[0] - A[0]) * (C[1] - B[1])
+    val = (B[0] - A[0]) * (C[1] - A[1]) - (B[1] - A[1]) * (C[0] - A[0])
+    if val == 0:
+      return 0
+    elif val > 0:
+      return 1
+    else:
+      return -1
+  
+  def dfs(self, u, p, adj, tin, low, st, timer = 0):
+    tin[u] = low[u] = timer
+    timer += 1
+    st.append(u)
+    for e in adj[u]:
+      v = e.toNode ^ e.fromNode ^ u
+      if v == p:
+        continue
+      if tin[v] != -1:
+        low[u] = min(low[u], tin[v])
+      else:
+        low[u] = min(low[u], low[v])
+        if low[v] > tin[u]:
+          None
+
 
   def Generate(self, n, m, k, d):
-    #return a random connected planar graph with n nodes and m edges and k bridges
-    #degree of each node is <= d 
+    # return a random connected planar graph with n nodes and m edges and k bridges
+    # degree of each node is <= d 
     #TODO
 
     if m < n - 1 or m > 3 * n - 6:
@@ -107,21 +134,109 @@ class PlanarGraphGenerator:
 
     G = Graph(n)
     points = [() for _ in range(n)]
-    for i in range(n):
-      points[i] = (random.randint(0, 1000000000), random.randint(0, 1000000000))
-
-    candidates = set()
-    for i in range(n):
-      candidates.add(i)
-
+    marked = [False for _ in range(n)]
     degrees = [0 for _ in range(n)]
     mat = [[False for _ in range(n)] for _ in range(n)]
+    adj = [[] for _ in range(n)]
     check = [[False for _ in range(n)] for _ in range(n)]
     cnt = 0
     # for i in range(m):
     edges = []
+    dsu = DSU(n)
+    for i in range(n):
+      points[i] = (random.randint(0, 1000000000), random.randint(0, 1000000000))
+
+    while True:
+      p = -1
+      idx = []
+      for i in range(n):
+        if marked[i] == False:
+          idx.append(i)
+          if p == -1 or points[i][1] < points[idx[p]][1] or (points[i][1] == points[idx[p]][1] and points[i][0] < points[idx[p]][0]):
+            p = len(idx) - 1
+
+      if p == -1:
+        break
+      # idx = [i for i in range(n)]
+      (idx[0], idx[p]) = (idx[p], idx[0])
+      def cmp(A, B):
+        o = self.ccw(points[idx[0]], points[A], points[B])
+        if o == 0:
+          if math.dist(points[idx[0]], points[A]) < math.dist(points[idx[0]], points[B]):
+            return -1
+          else:
+            return 1
+        return -o
+
+      # convex hull
+      idx = idx[:1] + sorted(idx[1:], key=cmp_to_key(cmp))
+      # for i in idx:
+      #   print(points[i], math.atan2(points[i][1] - points[idx[0]][1], points[i][0] - points[idx[0]][0]))
+
+      hull = []
+      for i in idx:
+        while len(hull) > 1 and self.ccw(points[hull[-2]], points[hull[-1]], points[i]) <= 0:
+          hull.pop()
+        hull.append(i)
+      
+      for i in hull:
+        marked[i] = True
+      #   print(points[i])
+
+
+      # for (i, e) in enumerate(edges):
+      #   if i < len(hull):
+      #     break
+      #   G.AddEdge(e[0], e[1])
+      #   dsu.union(e[0], e[1])
+
+      if len(hull) > 2:
+        for i in range(len(hull)):
+          u = hull[i]
+          v = hull[(i + 1) % len(hull)]
+          edges.append((u, v))
+          mat[u][v] = True
+          mat[v][u] = True
+          degrees[u] += 1
+          degrees[v] += 1
+          adj[u].append(v)
+          adj[v].append(u)
+          cnt += 1
+          dsu.union(u, v)
+          G.AddEdge(u, v)
+      else:
+        break
+
+    candidates = set()
+    for i in range(n):
+      if degrees[i] < d:
+        candidates.add(i)
+
     while True:
       # for _ in range(10000):
+        # if cnt * 2 > n and random.randint(0, 10000) < 1000:
+        #   for u in range(n):
+        #     ok = False
+        #     if d > 1 and degrees[u] == 1:
+        #       for p in adj[u]:
+        #         for v in adj[p]:
+        #           if v != u and degrees[v] < d and mat[u][v] == False:
+        #             mat[u][v] = mat[v][u] = True
+        #             degrees[u] += 1
+        #             degrees[v] += 1
+        #             if degrees[u] == d:
+        #               candidates.remove(u)
+        #             if degrees[v] == d:
+        #               candidates.remove(v)
+        #             adj[u].append(v)
+        #             adj[v].append(u)
+        #             edges.append((u, v))
+        #             cnt += 1
+        #             ok = True
+        #             break
+        #     if ok == True:
+        #       break
+
         if (len(candidates) < 2):
           # return None
           break
@@ -157,6 +272,8 @@ class PlanarGraphGenerator:
 
         mat[u][v] = True
         mat[v][u] = True
+        adj[u].append(v)
+        adj[v].append(u)
         # G.AddEdge(u, v)
         edges.append((u, v))
         degrees[u] += 1
@@ -168,29 +285,62 @@ class PlanarGraphGenerator:
         cnt += 1
         # break
 
-    if cnt < m:
-      return None
+    # if cnt < m:
+    #   return None
     
-    random.shuffle(edges)
-    dsu = DSU(n)
-    added = [False for _ in range(len(edges))]
-    for (i, e) in enumerate(edges):
-      if dsu.union(e[0], e[1]):
-        G.AddEdge(e[0], e[1])
-        added[i] = True
-        if dsu.ncc == 1:
-          print('connected')
-          break
 
-    cnt = m - n + 1
+    edges = edges[len(hull):]
     random.shuffle(edges)
-    for (i, e) in enumerate(edges):
-      if cnt == 0:
-        break
-      if added[i] == False:
-        G.AddEdge(e[0], e[1])
-        cnt -= 1
+    # for i in range(n):
+    #   for j in range(n):
+    #     mat[i][j] = mat[j][i] = False
+    for (i, j) in edges:
+      mat[i][j] = mat[j][i] = False
 
+    # print('cnt =', len(G.edges))
+    for e in edges:
+      # if dsu.union(e[0], e[1]):
+        G.AddEdge(e[0], e[1])
+        mat[e[0]][e[1]] = True
+        mat[e[1]][e[0]] = True
+        # if dsu.ncc == 1:
+        #   print('connected')
+        #   break
+
+    # if dsu.ncc > 1:
+    #   return None
+
+    # cnt = m - len(G.edges)
+    # random.shuffle(edges)
+    # for e in edges:
+    #   if cnt <= 0:
+    #     break
+    #   if mat[e[0]][e[1]] == False:
+    #     G.AddEdge(e[0], e[1])
+    #     cnt -= 1
+    
+    # for u in range(n):
+    #   if (degrees[u] == 1):
+    #     for v in range(n):
+    #       if (u != v and mat[u][v] == False and degrees[v] < d):
+    #         intersected = False
+    #         for e in G.edges:
+    #           x = e.fromNode
+    #           y = e.toNode
+    #           if x == u or x == v or y == u or y == v:
+    #             continue
+    #           if self.intersect(points[u], points[v], points[x], points[y]):
+    #             intersected = True
+    #             break
+    #         if intersected == True:
+    #           continue
+    #         G.AddEdge(u, v)
+    #         degrees[u] += 1
+    #         degrees[v] += 1
+    #         mat[u][v] = True
+    #         mat[v][u] = True
+    #         break
+    
     return G
 
 
@@ -201,7 +351,7 @@ G.Print()
 '''
 
 PG = PlanarGraphGenerator()
-G = PG.Generate(20, 30, 5, 10)
+G = PG.Generate(20, 30, 1, 4)
 if G != None:
   G.Print()
-  G.PrintUnweighted()
+  G.PrintUnweighted(offset = 1)
