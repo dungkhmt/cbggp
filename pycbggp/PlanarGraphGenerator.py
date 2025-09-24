@@ -192,9 +192,12 @@ class PlanarGraphGenerator:
       #   G.AddEdge(e[0], e[1])
       #   dsu.union(e[0], e[1])
 
-      if len(hull) > 2:
+      if len(hull) > 1:
         tot_hull_size += len(hull)
-        for i in range(len(hull)):
+        m = len(hull)
+        if m == 2:
+          m = 1
+        for i in range(m):
           u = hull[i]
           v = hull[(i + 1) % len(hull)]
           edges.append((u, v))
@@ -357,7 +360,7 @@ G.Print()
 '''
 
 PG = PlanarGraphGenerator()
-G = PG.Generate(50, 50, 1, 3)
+G = PG.Generate(30, 50, 1, 3)
 if G != None:
   G.Print()
   G.PrintUnweighted(offset = 1)
