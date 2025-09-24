@@ -122,13 +122,13 @@ class PlanarGraphGenerator:
       return None
     if k < 0 or k > n - 1:
       return None
-    if d < 0 or n * d < 2 * m:
-      return None
-    if d == 0:
-      if n == 1 and m == 0:
-        return Graph(1)
-      else:
-        return None
+    # if d < 0 or n * d < 2 * m:
+    #   return None
+    # if d == 0:
+    #   if n == 1 and m == 0:
+    #     return Graph(1)
+    #   else:
+    #     return None
     
     # print('valid')
 
@@ -145,7 +145,9 @@ class PlanarGraphGenerator:
     dsu = DSU(n)
     for i in range(n):
       points[i] = (random.randint(0, 1000000000), random.randint(0, 1000000000))
+    
 
+    tot_hull_size = 0
     while True:
       p = -1
       idx = []
@@ -191,6 +193,7 @@ class PlanarGraphGenerator:
       #   dsu.union(e[0], e[1])
 
       if len(hull) > 2:
+        tot_hull_size += len(hull)
         for i in range(len(hull)):
           u = hull[i]
           v = hull[(i + 1) % len(hull)]
@@ -206,6 +209,9 @@ class PlanarGraphGenerator:
           G.AddEdge(u, v)
       else:
         break
+    
+    # print(edges)
+    # print(degrees)
 
     candidates = set()
     for i in range(n):
@@ -289,7 +295,7 @@ class PlanarGraphGenerator:
     #   return None
     
 
-    edges = edges[len(hull):]
+    edges = edges[tot_hull_size:]
     random.shuffle(edges)
     # for i in range(n):
     #   for j in range(n):
@@ -351,7 +357,7 @@ G.Print()
 '''
 
 PG = PlanarGraphGenerator()
-G = PG.Generate(20, 30, 1, 4)
+G = PG.Generate(50, 50, 1, 3)
 if G != None:
   G.Print()
   G.PrintUnweighted(offset = 1)
