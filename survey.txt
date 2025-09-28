@@ -1,0 +1,80 @@
+@article{Ribeiro2021Survey,
+  title={A Survey on Subgraph Counting: Concepts, Algorithms, and Applications},
+  author={Ribeiro, Pedro and Paredes, Pedro and Silva, Fernando},
+  journal={ACM Comput. Surv.},
+  year={2021},
+  doi={10.1145/3446384}
+}
+
+@inproceedings{Wernicke2005ESU,
+  title={A Faster Algorithm for Detecting Network Motifs},
+  author={Sebastian Wernicke},
+  booktitle={WABI},
+  pages={165--177},
+  year={2005},
+  publisher={Springer},
+  doi={10.1007/11557067_14}
+}
+
+@article{Wernicke2006FANMOD,
+  title={FANMOD: a tool for fast network motif detection},
+  author={Sebastian Wernicke and Florian Rasche},
+  journal={Bioinformatics},
+  volume={22},
+  number={9},
+  pages={1152--1153},
+  year={2006},
+  doi={10.1093/bioinformatics/btl038}
+}
+
+@article{Avis1996ReverseSearch,
+  title={Reverse search for enumeration},
+  author={David Avis and Komei Fukuda},
+  journal={Discrete Applied Mathematics},
+  volume={65},
+  number={1-3},
+  pages={21--46},
+  year={1996},
+  doi={10.1016/0166-218X(95)00026-N}
+}
+
+@article{Alokshiya2019LinearDelay,
+  title={A linear delay algorithm for enumerating all connected induced subgraphs of a graph},
+  author={Alokshiya, Reem and Coudert, David and Komusiewicz, Christian and Sikora, Florian},
+  journal={BMC Bioinformatics},
+  volume={20},
+  number={1},
+  pages={1--13},
+  year={2019},
+  doi={10.1186/s12859-019-2881-2}
+}
+
+@inproceedings{Komusiewicz2021ConnectedEnum,
+  title={Enumerating connected induced subgraphs: Improved algorithms},
+  author={Komusiewicz, Christian and Mertzios, George B. and Nichterlein, Andr{\'e} and Niedermeier, Rolf},
+  booktitle={WG 2021},
+  pages={171--184},
+  year={2021},
+  publisher={Springer},
+  doi={10.1007/978-3-030-86838-3_14}
+}
+
+@article{Golovach2017Secluded,
+  title={Finding connected secluded subgraphs},
+  author={Golovach, Petr A. and Heggernes, Pinar and Kratsch, Dieter and Such{\'y}, Ondrej},
+  journal={Algorithmica},
+  volume={79},
+  number={2},
+  pages={567--600},
+  year={2017},
+  doi={10.1007/s00453-016-0162-3}
+}
+
+@article{Komusiewicz2024Delay,
+  title={An algorithm with a delay of O(k Δ) for enumerating connected induced subgraphs of size k},
+  author={Komusiewicz, Christian and others},
+  journal={arXiv preprint},
+  year={2024},
+  eprint={2402.04685},
+  archivePrefix={arXiv}
+}
