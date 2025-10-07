@@ -118,6 +118,6 @@ class ConnectedGraphGenerator:
   return
  
 gen = ConnectedGraphGenerator()
-g = gen.Generate(4, 4, 1)
+g = gen.Generate(7, 12, 2)
 if g:
  g.Print()

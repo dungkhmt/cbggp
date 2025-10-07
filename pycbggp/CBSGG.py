@@ -113,10 +113,24 @@ class Graph:
 
   def SaveToFile(self, filename):
     with open(filename, 'w') as f:
+      #print('Nodes = ', end=' ')
       line = ''
-      for node in self.nodes:
-        line = line + str(node.id) + ' '
-      f.write(line)
+      for v in range(self.n):
+        #print(v, end=' ')
+        line = line + str(v) + ' '
+      f.write(line + '\n')  
+      # for v in self.nodes:
+      #  print(v.toStr(),end = ' ')
+      #print('')
+      # for n in self.nodes:
+      #  print('Adj[' + n.toStr() + ']: ',end = ' ')
+
+      #print('Edges = ', end=' ')
+      
+      for e in self.edges:
+       line = str(e.fromNode) + ' ' + str(e.toNode)
+       #print(e.toStr(), end=' ')
+       f.write(line + '\n')
     f.close()
     return
 
@@ -278,6 +292,41 @@ class VarPath:
     self.G = G
     self.s = s
     self.t = t
+
+if __name__ == "__main__":
+ connected = 'Y'
+ nbNodes = 0
+ nbEdges = 0
+ nbBridges = 0
+ maxDegree = 10
+ gType = 'planar'
+ directed = 'N' 
+ filename = 'g.txt'
+ for i in range(len(sys.argv)):
+  #print('argv[',i,'] = ',sys.argv[i]) 
+  if sys.argv[i] == '-connected':
+   conneceted = sys.argv[i+1]
+  elif sys.argv[i] == '-nbNodes':
+   nbNodes = int(sys.argv[i+1])
+  elif sys.argv[i] == '-nbEdges':
+   nbEdges = int(sys.argv[i+1])
+  elif sys.argv[i] == '-type':
+   gType = sys.argv[i+1]
+  elif sys.argv[i] == '-directed':
+   directed = sys.argv[i+1] 
+  elif sys.argv[i] == '-nbBridges':
+   nbBridges = int(sys.argv[i+1])
+  elif sys.argv[i] == '-maxDegree':
+   maxDegree = int(sys.argv[i+1]) 
+  elif sys.argv[i] == '-filename':
+   filename = int(sys.argv[i+1])
+   
+ 
+ if gType == 'planar':
+  PGG = PlanarGraphGenerator()
+  G = PGG.Generate(nbNodes, nbEdges, nbBridges,maxDegree)
+  G.Print()
+  G.SaveToFile(filename)
 
 # main test...
 # n = 5

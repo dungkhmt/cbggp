@@ -113,10 +113,14 @@ class PlanarGraphGenerator:
           None
 
 
+  def name(self):
+    return 'PlanarGraphGenerator'
+    
   def Generate(self, n, m, k, d):
     # return a random connected planar graph with n nodes and m edges and k bridges
     # degree of each node is <= d 
     #TODO
+    print(self.name() + '::Generate, nodes = ',n,' edges = ',m,' max deg = ',d)
 
     if m < n - 1 or m > 3 * n - 6:
       return None
