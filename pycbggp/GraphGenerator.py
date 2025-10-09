@@ -12,6 +12,7 @@
 
 import sys
 from PlanarGraphGenerator import PlanarGraphGenerator
+from ConnectedGraphWithoutBridgeGenerator import ConnectedGraphWithoutBridgeGenerator
 
 def generateConnectedSubgraph():
  return None 
@@ -47,7 +48,14 @@ if __name__ == "__main__":
    filename = int(sys.argv[i+1])
    
  
- if gType == 'planar':
+ if gType == 'undirected':
+  if nbBridges == 0 and connected == 'Y':
+   CG = ConnectedGraphWithoutBridgeGenerator()
+   G = CG.GenerateONE(nbNodes, nbEdges)
+   G.SaveToFile(filename)
+   G.PrintNodesEdgesFormat()
+
+ elif gType == 'planar':
   PGG = PlanarGraphGenerator()
   G = PGG.Generate(nbNodes, nbEdges, nbBridges,maxDegree)
   G.Print()

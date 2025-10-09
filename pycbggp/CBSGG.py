@@ -79,6 +79,23 @@ class Graph:
     self.m -= 1
     return e
 
+  def CopyGraphMapNewNodes(self, nodeIds):
+    # by DungNT
+    # map id of the current graph to new nodeIds 
+    return None 
+  
+  def CopyGraphMapNewNodes(self, fromId, toId):
+    # by DungNT
+    # map id of the current graph to new node ids in the range [fromId..toId]  
+    return None 
+    
+  def LinkTwoGraphs(self, G1, node1, G2, node2):
+    # by DungNT 
+    # return a new created Graph by adding an edge connecting node1 of G1 and node2 of G2 
+    return None 
+    
+    
+    
   def Print(self):
     print('Nodes = ', end=' ')
     for v in range(self.n):
@@ -111,6 +128,22 @@ class Graph:
     for e in self.edges:
       print(e.fromNode + offset, e.toNode + offset)
 
+  def PrintNodesEdgesFormat(self):
+    V = '('
+    for i in range(self.n):
+      V = V + str(i)
+      if i < self.n-1:
+        V = V + ','
+    V = V + ')'
+    print(V)
+    E = '{'
+    for i in range(len(self.edges)):
+      e = self.edges[i]
+      E = E + '(' + str(e.fromNode) + ',' + str(e.toNode) + ')'
+      if i < len(self.edges)-1:
+        E = E + ','
+    E = E + '}'
+    print(E)    
   def SaveToFile(self, filename):
     with open(filename, 'w') as f:
       #print('Nodes = ', end=' ')
@@ -321,8 +354,13 @@ if __name__ == "__main__":
   elif sys.argv[i] == '-filename':
    filename = int(sys.argv[i+1])
    
- 
- if gType == 'planar':
+ if gType == 'undirected':
+  if nbBridges == 0 and connected == 'Y':
+   CG = ConnectedGraphWithoutBridgeGenerator()
+   G = CG.GenerateONE(nbNodes, nbEdges)
+   G.SaveToFile(filename)
+
+ elif gType == 'planar':
   PGG = PlanarGraphGenerator()
   G = PGG.Generate(nbNodes, nbEdges, nbBridges,maxDegree)
   G.Print()
