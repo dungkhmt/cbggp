@@ -23,11 +23,12 @@ Problems: generate a subgraph/subtree of a given graph with some properties:
 
 
 class Edge:
-  def __init__(self, fromNode: int, toNode: int, id: int, weight: int = 0):
+  def __init__(self, fromNode: int, toNode: int, id: int, weight: int = 0, offset: int = 0):
     self.fromNode = fromNode
     self.toNode = toNode
     self.weight = weight
     self.id = id
+    self.offset = offset
 
   def toStr(self):
     return '(' + str(self.fromNode) + ',' + str(self.toNode) + ')'
@@ -45,14 +46,15 @@ class Graph:
   #  for v in nodes:
   #   self.Adj[v] = []
 
-  def __init__(self, n: int):
+  def __init__(self, n: int, offset: int = 0):
     self.n = n
+    self.offset = offset
     self.edges: list[Edge] = []
     self.Adj: list[list[int]] = [[] for _ in range(n)]
     self.m = 0
 
   def AddEdge(self, fromNode: int, toNode: int, weight: int = 0):
-    e = Edge(fromNode, toNode, self.m, weight)
+    e = Edge(fromNode, toNode, self.m, weight, self.offset)
     self.Adj[fromNode].append(self.m)
     self.Adj[toNode].append(self.m)
     self.edges.append(e)
@@ -62,13 +64,14 @@ class Graph:
     self.Adj[e.fromNode].append(self.m)
     self.Adj[e.toNode].append(self.m)
     self.edges.append(e)
+    e.offset = self.offset
     self.m += 1
-  
-  def addFromAdj(self, adj : list[list[int]]):
+
+  def addFromAdj(self, adj: list[list[int]]):
     for u in range(self.n):
       for v in adj[u]:
         if u < v:
-          self.AddEdge(u,v)
+          self.AddEdge(u, v)
 
   def PopEdge(self):
     if self.m == 0:
@@ -81,25 +84,67 @@ class Graph:
 
   def CopyGraphMapNewNodes(self, nodeIds):
     # by DungNT
-    # map id of the current graph to new nodeIds 
-    return None 
-  
+    # map id of the current graph to new nodeIds
+
+    max_id = -1
+    min_id = int(1e9)
+    for id in nodeIds:
+      if id > max_id:
+        max_id = id
+      if id < min_id:
+        min_id = id
+
+    n = max_id - min_id + 1
+
+    G = Graph(n, min_id)
+    for e in self.edges:
+      G.AddEdge(nodeIds[e.fromNode] - min_id,
+                nodeIds[e.toNode] - min_id, e.weight)
+
+    return G
+
   def CopyGraphMapNewNodes(self, fromId, toId):
     # by DungNT
-    # map id of the current graph to new node ids in the range [fromId..toId]  
-    return None 
+    # map id of the current graph to new node ids in the range [fromId..toId]
+
+    n = toId - fromId + 1
+    assert n == self.n, 'Error: range_id of new graph must be equal to the original graph!'
+    G = Graph(n, fromId)
+    for e in self.edges:
+      G.AddEdge(e.fromNode, e.toNode, e.weight)
+
+    return G
+
+  def LinkTwoGraphs(self, G1, node1, G2, node2, is_offset = True):
+    # by DungNT
+    # return a new created Graph by adding an edge connecting node1 of G1 and node2 of G2
+
+    if G1.offset > G2.offset:
+      tmp = G1
+      G1 = G2
+      G2 = tmp
+
+    delta = G2.offset - G1.offset
+    n = max(G1.n, G2.n + delta)
+
+    G = Graph(n, G1.offset)
+    for e in G1.edges:
+      G.AddEdge(e.fromNode, e.toNode, e.weight)
     
-  def LinkTwoGraphs(self, G1, node1, G2, node2):
-    # by DungNT 
-    # return a new created Graph by adding an edge connecting node1 of G1 and node2 of G2 
-    return None 
-    
-    
-    
+    for e in G2.edges:
+      G.AddEdge(e.fromNode + delta, e.toNode + delta, e.weight)
+
+    if is_offset:
+      G.AddEdge(node1, node2 + delta)
+    else:
+      G.AddEdge(node1 - G1.offset, node2 - G1.offset)
+
+    return G
+
   def Print(self):
     print('Nodes = ', end=' ')
     for v in range(self.n):
-      print(v, end=' ')
+      print(v + self.offset, end=' ')
     # for v in self.nodes:
     #  print(v.toStr(),end = ' ')
     print('')
@@ -118,20 +163,21 @@ class Graph:
         print(self.edges[e].toStr(), end=' ')
       print('')
 
-  def PrintWeighted(self, offset = 0):
+  def PrintWeighted(self, offset=0):
     print(self.n, self.m)
     for e in self.edges:
-      print(e.fromNode + offset, e.toNode + offset, e.weight)
+      print(e.fromNode + offset + self.offset,
+            e.toNode + offset + self.offset, e.weight)
 
-  def PrintUnweighted(self, offset = 0):
+  def PrintUnweighted(self, offset=0):
     print(self.n, self.m)
     for e in self.edges:
-      print(e.fromNode + offset, e.toNode + offset)
+      print(e.fromNode + offset + self.offset, e.toNode + offset + self.offset)
 
   def PrintNodesEdgesFormat(self):
     V = '('
     for i in range(self.n):
-      V = V + str(i)
+      V = V + str(i + self.offset)
       if i < self.n-1:
         V = V + ','
     V = V + ')'
@@ -139,31 +185,58 @@ class Graph:
     E = '{'
     for i in range(len(self.edges)):
       e = self.edges[i]
-      E = E + '(' + str(e.fromNode) + ',' + str(e.toNode) + ')'
+      E = E + '(' + str(e.fromNode + self.offset) + \
+          ',' + str(e.toNode + self.offset) + ')'
       if i < len(self.edges)-1:
         E = E + ','
     E = E + '}'
-    print(E)    
+    print(E)
+
   def SaveToFile(self, filename):
     with open(filename, 'w') as f:
-      #print('Nodes = ', end=' ')
+      # print('Nodes = ', end=' ')
       line = ''
       for v in range(self.n):
-        #print(v, end=' ')
-        line = line + str(v) + ' '
-      f.write(line + '\n')  
+        # print(v, end=' ')
+        line = line + str(v + self.offset) + ' '
+      f.write(line + '\n')
       # for v in self.nodes:
       #  print(v.toStr(),end = ' ')
-      #print('')
+      # print('')
       # for n in self.nodes:
       #  print('Adj[' + n.toStr() + ']: ',end = ' ')
 
-      #print('Edges = ', end=' ')
-      
+      # print('Edges = ', end=' ')
+
       for e in self.edges:
-       line = str(e.fromNode) + ' ' + str(e.toNode)
-       #print(e.toStr(), end=' ')
-       f.write(line + '\n')
+        line = str(e.fromNode + self.offset) + \
+            ' ' + str(e.toNode + self.offset)
+        # print(e.toStr(), end=' ')
+        f.write(line + '\n')
+    f.close()
+    return
+
+  def SaveToFileWeighted(self, filename):
+    with open(filename, 'w') as f:
+      # print('Nodes = ', end=' ')
+      line = ''
+      for v in range(self.n):
+        # print(v, end=' ')
+        line = line + str(v + self.offset) + ' '
+      f.write(line + '\n')
+      # for v in self.nodes:
+      #  print(v.toStr(),end = ' ')
+      # print('')
+      # for n in self.nodes:
+      #  print('Adj[' + n.toStr() + ']: ',end = ' ')
+
+      # print('Edges = ', end=' ')
+
+      for e in self.edges:
+        line = str(e.fromNode + self.offset) + ' ' + \
+            str(e.toNode + self.offset) + ' ' + str(e.weight)
+        # print(e.toStr(), end=' ')
+        f.write(line + '\n')
     f.close()
     return
 
@@ -175,11 +248,11 @@ class Graph:
 
 
 class DirectedGraph(Graph):
-  def __init__(self, n: int):
-    super().__init__(n)
+  def __init__(self, n: int, offset: int = 0):
+    super().__init__(n, offset)
 
   def AddEdge(self, fromNode: int, toNode: int, weight: int = 0):
-    e = Edge(fromNode, toNode, self.m, weight)
+    e = Edge(fromNode, toNode, self.m, weight, self.offset)
     self.Adj[fromNode].append(self.m)
     self.edges.append(e)
     self.m += 1
@@ -187,6 +260,7 @@ class DirectedGraph(Graph):
   def AddEdge1(self, e: Edge):
     self.Adj[e.fromNode].append(self.m)
     self.edges.append(e)
+    e.offset = self.offset
     self.m += 1
 
   def PopEdge(self):
@@ -200,7 +274,7 @@ class DirectedGraph(Graph):
   def Print(self):
     print('Nodes = ', end=' ')
     for v in range(self.n):
-      print(v, end=' ')
+      print(v + self.offset, end=' ')
     print('')
 
     print('Edges = ', end=' ')
@@ -209,26 +283,75 @@ class DirectedGraph(Graph):
     print('')
 
     for n in range(self.n):
-      print('Adj[' + str(n) + ']: ', end=' ')
+      print('Adj[' + str(n + self.offset) + ']: ', end=' ')
 
       for e in self.Adj[n]:
         print(self.edges[e].toStr(), end=' ')
       print('')
 
-  def PrintWeighted(self, offset = 0):
+  def PrintWeighted(self, offset=0):
     print(self.n, self.m)
     for e in self.edges:
-      print(e.fromNode + offset, e.toNode + offset, e.weight)
+      print(e.fromNode + offset + self.offset,
+            e.toNode + offset + self.offset, e.weight)
 
-  def PrintUnweighted(self, offset = 0):
+  def PrintUnweighted(self, offset=0):
     print(self.n, self.m)
     for e in self.edges:
-      print(e.fromNode + offset, e.toNode + offset)
+      print(e.fromNode + offset + self.offset, e.toNode + offset + self.offset)
 
-  def addFromAdj(self, adj : list[list[int]]):
+  def addFromAdj(self, adj: list[list[int]]):
     for u in range(self.n):
       for v in adj[u]:
-        self.AddEdge(u,v)
+        self.AddEdge(u, v)
+
+  def SaveToFile(self, filename):
+    with open(filename, 'w') as f:
+      # print('Nodes = ', end=' ')
+      line = ''
+      for v in range(self.n):
+        # print(v, end=' ')
+        line = line + str(v + self.offset) + ' '
+      f.write(line + '\n')
+      # for v in self.nodes:
+      #  print(v.toStr(),end = ' ')
+      # print('')
+      # for n in self.nodes:
+      #  print('Adj[' + n.toStr() + ']: ',end = ' ')
+
+      # print('Edges = ', end=' ')
+
+      for e in self.edges:
+        line = str(e.fromNode + self.offset) + \
+            ' ' + str(e.toNode + self.offset)
+        # print(e.toStr(), end=' ')
+        f.write(line + '\n')
+    f.close()
+    return
+
+  def SaveToFileWeighted(self, filename):
+    with open(filename, 'w') as f:
+      # print('Nodes = ', end=' ')
+      line = ''
+      for v in range(self.n):
+        # print(v, end=' ')
+        line = line + str(v + self.offset) + ' '
+      f.write(line + '\n')
+      # for v in self.nodes:
+      #  print(v.toStr(),end = ' ')
+      # print('')
+      # for n in self.nodes:
+      #  print('Adj[' + n.toStr() + ']: ',end = ' ')
+
+      # print('Edges = ', end=' ')
+
+      for e in self.edges:
+        line = str(e.fromNode + self.offset) + ' ' + \
+            str(e.toNode + self.offset) + ' ' + str(e.weight)
+        # print(e.toStr(), end=' ')
+        f.write(line + '\n')
+    f.close()
+    return
 
   def copy(self):
     G = DirectedGraph(self.n)
@@ -326,45 +449,46 @@ class VarPath:
     self.s = s
     self.t = t
 
-if __name__ == "__main__":
- connected = 'Y'
- nbNodes = 0
- nbEdges = 0
- nbBridges = 0
- maxDegree = 10
- gType = 'planar'
- directed = 'N' 
- filename = 'g.txt'
- for i in range(len(sys.argv)):
-  #print('argv[',i,'] = ',sys.argv[i]) 
-  if sys.argv[i] == '-connected':
-   conneceted = sys.argv[i+1]
-  elif sys.argv[i] == '-nbNodes':
-   nbNodes = int(sys.argv[i+1])
-  elif sys.argv[i] == '-nbEdges':
-   nbEdges = int(sys.argv[i+1])
-  elif sys.argv[i] == '-type':
-   gType = sys.argv[i+1]
-  elif sys.argv[i] == '-directed':
-   directed = sys.argv[i+1] 
-  elif sys.argv[i] == '-nbBridges':
-   nbBridges = int(sys.argv[i+1])
-  elif sys.argv[i] == '-maxDegree':
-   maxDegree = int(sys.argv[i+1]) 
-  elif sys.argv[i] == '-filename':
-   filename = int(sys.argv[i+1])
-   
- if gType == 'undirected':
-  if nbBridges == 0 and connected == 'Y':
-   CG = ConnectedGraphWithoutBridgeGenerator()
-   G = CG.GenerateONE(nbNodes, nbEdges)
-   G.SaveToFile(filename)
 
- elif gType == 'planar':
-  PGG = PlanarGraphGenerator()
-  G = PGG.Generate(nbNodes, nbEdges, nbBridges,maxDegree)
-  G.Print()
-  G.SaveToFile(filename)
+if __name__ == "__main__":
+  connected = 'Y'
+  nbNodes = 0
+  nbEdges = 0
+  nbBridges = 0
+  maxDegree = 10
+  gType = 'planar'
+  directed = 'N'
+  filename = 'g.txt'
+  for i in range(len(sys.argv)):
+    # print('argv[',i,'] = ',sys.argv[i])
+    if sys.argv[i] == '-connected':
+      conneceted = sys.argv[i+1]
+    elif sys.argv[i] == '-nbNodes':
+      nbNodes = int(sys.argv[i+1])
+    elif sys.argv[i] == '-nbEdges':
+      nbEdges = int(sys.argv[i+1])
+    elif sys.argv[i] == '-type':
+      gType = sys.argv[i+1]
+    elif sys.argv[i] == '-directed':
+      directed = sys.argv[i+1]
+    elif sys.argv[i] == '-nbBridges':
+      nbBridges = int(sys.argv[i+1])
+    elif sys.argv[i] == '-maxDegree':
+      maxDegree = int(sys.argv[i+1])
+    elif sys.argv[i] == '-filename':
+      filename = int(sys.argv[i+1])
+
+  if gType == 'undirected':
+    if nbBridges == 0 and connected == 'Y':
+      CG = ConnectedGraphWithoutBridgeGenerator()
+      G = CG.GenerateONE(nbNodes, nbEdges)
+      G.SaveToFile(filename)
+
+  elif gType == 'planar':
+    PGG = PlanarGraphGenerator()
+    G = PGG.Generate(nbNodes, nbEdges, nbBridges, maxDegree)
+    G.Print()
+    G.SaveToFile(filename)
 
 # main test...
 # n = 5
