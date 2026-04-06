@@ -31,8 +31,11 @@ def partition_vertices(n, m, k):
         max_edges += sz * (sz - 1) // 2
         if (sz >= 3):
             min_edges += sz
+    in_PQ = [0] * (c)
+    in_PQ[0] = 1
+    PQ = [0] if s[0] > 2 else []
     for step in range(100000): 
-        u = random.randint(0, c - 1)
+        u = random.choice(PQ)
         v = random.randint(0, c - 1)
         if (u == v):
             continue
@@ -47,6 +50,9 @@ def partition_vertices(n, m, k):
                 min_edges += delta_min_edges
                 s[u] -= cnt_move
                 s[v] += cnt_move
+                if (s[v] >= 3 and in_PQ[v] == 0):
+                    in_PQ[v] = 1;
+                    PQ.append(v)
     return s
 n, m, k = map(int, input().split())
 
