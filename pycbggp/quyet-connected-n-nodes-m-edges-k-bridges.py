@@ -77,11 +77,12 @@ else:
         edge.append((u, v))
     ec = [0] * (k + 1)
     ST = []
+    num_e = m - k
     for i in range(0, k + 1):
         if (S[i] >= 3):
             ec[i] = S[i]
             ST.append(i)
-    num_e = m - k
+            num_e -= S[i]
     while (num_e > 0 and len(ST) > 0):
         sz = len(ST)
         i = random.randint(0, sz - 1)
