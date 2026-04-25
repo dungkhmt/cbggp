@@ -1,5 +1,6 @@
 import sys
 import random
+from CBSGG import Graph, Edge
 def delta_max(x, y, t):
     old_x = x * (x - 1) // 2
     old_y = y * (y - 1) // 2
@@ -144,17 +145,20 @@ else:
             for i in range(0, need_edge):
                 u, v = all_edge[i]
                 edge.append((u, v))
-    print(n, end = " ")
-    print(m)
     # Random vertex
     Idx = list(range(1, n + 1))
-    for i in range(0, 100):
-        random.shuffle(Idx)
-    for i in range(0, 100):
-        random.shuffle(edge)
+    random.shuffle(Idx)
+    random.shuffle(edge)
+    # print(n, end = " ")
+    # print(m)
+    # for (u, v) in edge:
+    #     print(Idx[u], end = " ")
+    #     print(Idx[v])
+    Res = Graph(n)
     for (u, v) in edge:
-        print(Idx[u], end = " ")
-        print(Idx[v])
+        Res.AddEdge(Idx[u] - 1, Idx[v] - 1)
+
+    Res.Print()
 
 
 
