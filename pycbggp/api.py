@@ -1,5 +1,6 @@
 from CBSGG import Graph,DirectedGraph
 import random
+from Undirected_Tree_diameter_between_P_and_Q_and_degree_at_most_D import UndirectedTreeDiameterBetweenPandQAndDegreeAtMostDGenerator
 # undirected graphs
 def gen_undirected_graph(nb_nodes, nb_edges, nb_connected_components, nb_bridges, nb_articulation_points):
  G = Graph(nb_nodes)
@@ -202,6 +203,11 @@ def gen_undirected_tree(nb_nodes):
 def gen_undirected_tree_bounded_diameter_degree(nb_nodes, ub_deg, ub_diameter):
  G = Graph(nb_nodes)
  return G  
+
+def gen_undirected_tree_diameter_between_P_and_Q_and_degree_at_most_D(n, p, q, d):
+    gen = UndirectedTreeDiameterBetweenPandQAndDegreeAtMostDGenerator()
+    G = gen.generate(n, p, q, d)
+    return G
   
 # directed graphs 
 def gen_directed_graph(nb_nodes, nb_edges):
@@ -389,9 +395,9 @@ def gen_directed_graph_nb_strongly_connected_components(nb_nodes, nb_edges, nb_s
     return Res
  
 
-# main    
-G = gen_undirected_connected_graph_nb_bridges(7, 8, 2)
-G.Print()
+# G = gen_undirected_connected_graph_nb_bridges(7, 8, 2)
+# G.Print()
 
- 
+# G = gen_undirected_tree_diameter_between_P_and_Q_and_degree_at_most_D(6, 2, 3, 3)
+# G.Print()
  

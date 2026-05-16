@@ -23,12 +23,16 @@ Problems: generate a subgraph/subtree of a given graph with some properties:
 
 
 class Edge:
-  def __init__(self, fromNode: int, toNode: int, id: int, weight: int = 0, offset: int = 0):
+  def __init__(self, fromNode: int, toNode: int, id: int, weight: int = 0, offset: int = 0, used: int = 1):
     self.fromNode = fromNode
     self.toNode = toNode
     self.weight = weight
     self.id = id
     self.offset = offset
+    self.used = used
+
+  def copy(self):
+    return Edge(self.fromNode, self.toNode, self.id, self.weight, self.offset, self.used)
 
   def toStr(self):
     return '(' + str(self.fromNode) + ',' + str(self.toNode) + ')'
@@ -80,6 +84,13 @@ class Graph:
     self.Adj[e.fromNode].pop()
     self.Adj[e.toNode].pop()
     self.m -= 1
+    return e
+  
+  def DeleteEdge(self, idEdge: int):
+    e: Edge = self.edges[idEdge]
+    e.used = 0
+    self.Adj[e.fromNode].remove(e.id)
+    self.Adj[e.toNode].remove(e.id)
     return e
 
   def CopyGraphMapNewNodes(self, nodeIds):
@@ -241,9 +252,10 @@ class Graph:
     return
 
   def copy(self):
-    G = Graph(self.n)
+    G = Graph(self.n, self.offset)
     for e in self.edges:
-      G.AddEdge1(e)
+      if e.used == 1:
+        G.AddEdge(e.fromNode, e.toNode, e.weight)
     return G
 
 
