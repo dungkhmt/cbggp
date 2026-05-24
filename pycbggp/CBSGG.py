@@ -126,6 +126,12 @@ class Graph:
 
     return G
 
+  def LinkTwoGraphMergeNode(self, G1, node1, G2, node2):
+    # resulting graph G has nodes = (V(G1)\{nodes}) unify (V(G2)\{node2}) unify node (node1 fusing node2)
+    # TODO by DungNT 
+    
+    return None 
+    
   def LinkTwoGraphs(self, G1, node1, G2, node2, is_offset = True):
     # by DungNT
     # return a new created Graph by adding an edge connecting node1 of G1 and node2 of G2
