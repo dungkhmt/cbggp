@@ -128,9 +128,26 @@ class Graph:
 
   def LinkTwoGraphMergeNode(self, G1, node1, G2, node2):
     # resulting graph G has nodes = (V(G1)\{nodes}) unify (V(G2)\{node2}) unify node (node1 fusing node2)
+    # merge G2 into G1 and return G1, offset is the same as G1
+
     # TODO by DungNT 
     
-    return None 
+    n = G1.n + G2.n - 1
+    G = Graph(n, G1.offset)
+    for e in G1.edges:
+      G.AddEdge(e.fromNode, e.toNode, e.weight)
+    delta = G1.n + G1.offset - G2.offset
+    for e in G2.edges:
+      o1 = 1 if e.fromNode > node2 else 0
+      o2 = 1 if e.toNode > node2 else 0
+      if e.fromNode != node2 and e.toNode != node2:
+        G.AddEdge(e.fromNode + delta - o1, e.toNode + delta - o2, e.weight)
+      elif e.fromNode == node2:
+        G.AddEdge(node1, e.toNode + delta - o2, e.weight)
+      else: 
+        G.AddEdge(e.fromNode + delta - o1, node1, e.weight)
+
+    return G
     
   def LinkTwoGraphs(self, G1, node1, G2, node2, is_offset = True):
     # by DungNT
@@ -322,6 +339,87 @@ class DirectedGraph(Graph):
     for u in range(self.n):
       for v in adj[u]:
         self.AddEdge(u, v)
+
+  def CopyGraphMapNewNodes(self, nodeIds):
+    # by DungNT
+    # map id of the current graph to new nodeIds
+
+    max_id = -1
+    min_id = int(1e9)
+    for id in nodeIds:
+      if id > max_id:
+        max_id = id
+      if id < min_id:
+        min_id = id
+
+    n = max_id - min_id + 1
+
+    G = DirectedGraph(n, min_id)
+    for e in self.edges:
+      G.AddEdge(nodeIds[e.fromNode] - min_id,
+                nodeIds[e.toNode] - min_id, e.weight)
+
+    return G
+
+  def CopyGraphMapNewNodes(self, fromId, toId):
+    # by DungNT
+    # map id of the current graph to new node ids in the range [fromId..toId]
+
+    n = toId - fromId + 1
+    assert n == self.n, 'Error: range_id of new graph must be equal to the original graph!'
+    G = DirectedGraph(n, fromId)
+    for e in self.edges:
+      G.AddEdge(e.fromNode, e.toNode, e.weight)
+
+    return G
+
+
+  def LinkTwoGraphMergeNode(self, G1, node1, G2, node2):
+    # resulting graph G has nodes = (V(G1)\{nodes}) unify (V(G2)\{node2}) unify node (node1 fusing node2)
+    # TODO by DungNT 
+    
+    n = G1.n + G2.n - 1
+    G = DirectedGraph(n, G1.offset)
+    for e in G1.edges:
+      G.AddEdge(e.fromNode, e.toNode, e.weight)
+    delta = G1.n + G1.offset - G2.offset
+    for e in G2.edges:
+      o1 = 1 if e.fromNode > node2 else 0
+      o2 = 1 if e.toNode > node2 else 0
+      if e.fromNode != node2 and e.toNode != node2:
+        G.AddEdge(e.fromNode + delta - o1, e.toNode + delta - o2, e.weight)
+      elif e.fromNode == node2:
+        G.AddEdge(node1, e.toNode + delta - o2, e.weight)
+      else: 
+        G.AddEdge(e.fromNode + delta - o1, node1, e.weight)
+
+    return G
+    
+  def LinkTwoGraphs(self, G1, node1, G2, node2, is_offset = True):
+    # by DungNT
+    # return a new created Graph by adding an edge connecting node1 of G1 and node2 of G2
+
+    if G1.offset > G2.offset:
+      tmp = G1
+      G1 = G2
+      G2 = tmp
+
+    delta = G2.offset - G1.offset
+    n = max(G1.n, G2.n + delta)
+
+    G = DirectedGraph(n, G1.offset)
+    for e in G1.edges:
+      G.AddEdge(e.fromNode, e.toNode, e.weight)
+    
+    for e in G2.edges:
+      G.AddEdge(e.fromNode + delta, e.toNode + delta, e.weight)
+
+    if is_offset:
+      G.AddEdge(node1, node2 + delta)
+    else:
+      G.AddEdge(node1 - G1.offset, node2 - G1.offset)
+
+    return G
 
   def SaveToFile(self, filename):
     with open(filename, 'w') as f:
