@@ -28,8 +28,8 @@ class Quad:
     self.r().set_prev(q)
   
 class Delaunay:
-  def __init__(self, points):
-    self.points = points
+  def __init__(self, points = None):
+    # self.points = points
     self.H = None
   
   # is p in the circumcircle of a, b, c?
@@ -80,14 +80,13 @@ class Delaunay:
     ra, A = self.rec(s[:half])
     B, rb = self.rec(s[half:])
 
-    # while (B.p.cross(A.F(), A.p) < 0 and (A := A.next())) or (A.p.cross(B.F(), B.p) > 0 and (B := B.r().o)):
     while True:
       if (B.p.cross(A.F(), A.p) < 0):
         A = A.next()
-      if (A.p.cross(B.F(), B.p) > 0):
+      elif (A.p.cross(B.F(), B.p) > 0):
         B = B.r().o
-
-      break
+      else:
+        break
 
     base = self.connect(B.r(), A)
     if (A.p == ra.p):

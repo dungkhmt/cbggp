@@ -21,9 +21,9 @@ class Point:
   
   def dot(self, p):
     return self.x * p.x + self.y * p.y
-  def cross(self, p):
-    return self.x * p.y - self.y * p.x
-  def cross(self, p1, p2):
+  def cross(self, p1, p2 = None):
+    if p2 is None:
+      return self.x * p1.y - self.y * p1.x
     return (p1 - self).cross(p2 - self)
   def dist2(self):
     return self.x * self.x + self.y * self.y
