@@ -4,18 +4,46 @@ from Delaunay import Delaunay
 from DSU import DSU
 import random
 
-from Undirected_Tree_diameter_between_P_and_Q_and_degree_at_most_D import UndirectedTreeDiameterBetweenPandQAndDegreeAtMostDGenerator
+from heuristicmethods.Undirected_Tree_diameter_between_P_and_Q_and_degree_at_most_D import UndirectedTreeDiameterBetweenPandQAndDegreeAtMostDGenerator
 
 from heuristicmethods.undirectedconnectedgraphkbridges import generate_undirected_connected_graph_nb_bridges
 from heuristicmethods.directedgraphkstronglyconnectedcomponent import generate_directed_graph_nb_strongly_connected_components
+from heuristicmethods.constrained_structural_graph_generator import (
+    generate_constructive,
+    generate_mcmc,
+    generate_simulated_annealing,
+    generate_graph,
+    check_feasibility,
+    tarjan_analysis,
+    verify_graph,
+)
 
 
 
 # undirected graphs
-def gen_undirected_graph(nb_nodes, nb_edges, nb_connected_components, nb_bridges, nb_articulation_points):
- # TODO by Nguyen Ngoc Tuan Anh
- G = Graph(nb_nodes)
- return G  
+def gen_undirected_graph(nb_nodes, nb_edges, nb_connected_components,
+                        nb_bridges, nb_articulation_points,
+                        method='constructive', **kwargs):
+    """
+    Generate an undirected graph satisfying exact constraints (V, E, C, B, A).
+
+    method:
+        'constructive' — Direct construction, O(V+E), 100% exact.
+        'mcmc'         — MCMC Edge Rewiring, generates diverse random graphs.
+                         kwargs: nb_iterations=1000
+        'sa'           — Simulated Annealing, heuristic for complex cases.
+                         kwargs: max_iterations=10000, T_init=100.0, alpha=0.995
+
+    Returns Graph or None. See constrained_structural_graph_generator.py for details.
+
+    Examples:
+        G = gen_undirected_graph(10, 15, 1, 2, 3)
+        G = gen_undirected_graph(10, 15, 1, 2, 3, method='mcmc', nb_iterations=2000)
+        G = gen_undirected_graph(8, 12, 1, 0, 0, method='sa', max_iterations=5000)
+    """
+    return generate_graph(nb_nodes, nb_edges, nb_connected_components,
+                          nb_bridges, nb_articulation_points,
+                          method=method, **kwargs)
 
 def gen_undirected_connected_graph(nb_nodes, nb_edges):
  # TODO by Nguyen Ngoc Tuan Anh
