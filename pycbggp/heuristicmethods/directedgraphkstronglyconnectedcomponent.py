@@ -69,7 +69,7 @@ def generate_directed_graph_nb_strongly_connected_components(nb_nodes, nb_edges,
 
     edge = []
     if (m < n and not(m == n - 1 and k == n)) :
-        print(-1)
+        return None
     else :
         # Tạo khung cho k scc
         # for i in range(0, k):

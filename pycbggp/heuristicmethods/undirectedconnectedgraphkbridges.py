@@ -64,7 +64,7 @@ def generate_undirected_connected_graph_nb_bridges(nb_nodes, nb_edges, nb_bridge
     S = partition_vertices(n, m, k)
 
     if S is None : 
-        print(-1)
+        return None
     else:
         edge = []
         L = [0] * (k + 1)
