@@ -63,7 +63,12 @@ class Graph:
     self.Adj[toNode].append(self.m)
     self.edges.append(e)
     self.m += 1
-
+  
+  def gen_random_weight_edges(self,min_w,max_w):
+    for e in self.edges:
+      e.weight = rd.randint(min_w,max_w)
+      print('edge (',e.fromNode,',',e.toNode,') weight = ',e.weight)
+      
   def AddEdge1(self, e: Edge):
     self.Adj[e.fromNode].append(self.m)
     self.Adj[e.toNode].append(self.m)
@@ -126,6 +131,17 @@ class Graph:
 
     return G
 
+  def union_two_graphs(self,g1, g2):
+    # by PQD, to be checked carefully the ids consistence  
+    n = g1.n + g2.n 
+    G = Graph(n)
+    for e in g1.edges:
+      G.AddEdge(e.fromNode, e.toNode, e.weight)  
+    for e in g2.edges:
+      G.AddEdge(e.fromNode, e.toNode, e.weight)  
+
+    return G
+    
   def LinkTwoGraphMergeNode(self, G1, node1, G2, node2):
     # resulting graph G has nodes = (V(G1)\{nodes}) unify (V(G2)\{node2}) unify node (node1 fusing node2)
     # merge G2 into G1 and return G1, offset is the same as G1
