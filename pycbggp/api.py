@@ -4,66 +4,67 @@ from Delaunay import Delaunay
 from DSU import DSU
 import random
 
+# Heuristic methods 
 from heuristicmethods.Undirected_Tree_diameter_between_P_and_Q_and_degree_at_most_D import UndirectedTreeDiameterBetweenPandQAndDegreeAtMostDGenerator
-
 from heuristicmethods.undirectedconnectedgraphkbridges import generate_undirected_connected_graph_nb_bridges
 from heuristicmethods.directedgraphkstronglyconnectedcomponent import generate_directed_graph_nb_strongly_connected_components
-from heuristicmethods.constrained_structural_graph_generator import generate_graph
+from heuristicmethods.constrained_graph import generate_graph
 from heuristicmethods.undirectedcompletegraph import generate_undirected_complete_graph
 from heuristicmethods.bipartitegraph import generate_bipartite_graph
 from heuristicmethods.connectedbipartitegraph import generate_connected_bipartite_graph
 from heuristicmethods.directedgraph import generate_directed_graph
 from heuristicmethods.directedstronglyconnectedgraph import generate_directed_strongly_connected_graph
 
+# Constructive methods 
+from constructivemethods.undirected_connected_graph import generate_undirected_connected_graph
+from constructivemethods.undirected_connected_graph_no_bridge import generate_undirected_connected_graph_no_bridge
+from constructivemethods.biconnected_graph import generate_biconnected_graph
+from constructivemethods.undirected_tree import generate_undirected_tree
+from constructivemethods.undirected_tree_bounded_diameter_degree import generate_undirected_tree_bounded_diameter_degree
+from constructivemethods.constrained_graph import (
+    generate_constructive, tarjan_analysis, check_feasibility as check_feasibility_vecba,
+    verify_graph,
+)
+
 # undirected graphs
 def gen_undirected_graph(nb_nodes, nb_edges, nb_connected_components,
                         nb_bridges, nb_articulation_points,
                         method='constructive', **kwargs):
-    """
-    Generate an undirected graph satisfying exact constraints (V, E, C, B, A).
+    # by Nguyen Ngoc Tuan Anh
+    # Generate an undirected graph satisfying exact constraints (V, E, C, B, A).
+    # method:
+    #     'constructive' — 4-phase constructive algorithm, O(V+E), 100% exact (default).
+    #     'mcmc'         — MCMC edge rewiring, produces diverse random graphs.
+    #                      kwargs: nb_iterations=1000
+    #     'sa'           — Simulated Annealing, heuristic fallback.
+    #                      kwargs: max_iterations=10000, T_init=100.0, alpha=0.995
 
-    method:
-        'constructive' — Direct construction, O(V+E), 100% exact.
-        'mcmc'         — MCMC Edge Rewiring, generates diverse random graphs.
-                         kwargs: nb_iterations=1000
-        'sa'           — Simulated Annealing, heuristic for complex cases.
-                         kwargs: max_iterations=10000, T_init=100.0, alpha=0.995
-
-    Returns Graph or None. See constrained_structural_graph_generator.py for details.
-
-    Examples:
-        G = gen_undirected_graph(10, 15, 1, 2, 3)
-        G = gen_undirected_graph(10, 15, 1, 2, 3, method='mcmc', nb_iterations=2000)
-        G = gen_undirected_graph(8, 12, 1, 0, 0, method='sa', max_iterations=5000)
-    """
+    # Returns Graph or None if the input is infeasible.
     return generate_graph(nb_nodes, nb_edges, nb_connected_components,
                           nb_bridges, nb_articulation_points,
                           method=method, **kwargs)
 
 def gen_undirected_connected_graph(nb_nodes, nb_edges):
- # TODO by Nguyen Ngoc Tuan Anh
- 
- G = Graph(nb_nodes)
- 
- return G  
+    # by Nguyen Ngoc Tuan Anh
+    # Algorithm: Random Spanning Tree (DSU) + Random Edge Fill. O(V+E).
+    return generate_undirected_connected_graph(nb_nodes, nb_edges)
  
 def gen_undirected_connected_graph_no_bridge(nb_nodes, nb_edges):
- # TODO by Nguyen Ngoc Tuan Anh 
- G = Graph(nb_nodes)
- 
- return G  
+    # by Nguyen Ngoc Tuan Anh
+    # Algorithm: Hamiltonian Cycle + Random Extra Edges. O(V+E).
+    return generate_undirected_connected_graph_no_bridge(nb_nodes, nb_edges)
 
 def gen_undirected_connected_graph_no_articulation_point(nb_nodes, nb_edges):
- # TODO by Nguyen Ngoc Tuan Anh
- 
- G = Graph(nb_nodes)
- return G  
+    # by Nguyen Ngoc Tuan Anh
+    # Algorithm: Open Ear Decomposition. O(V+E).
+    # Biconnected graph ⟹ no articulation point AND no bridge.
+    return generate_biconnected_graph(nb_nodes, nb_edges)
 
 def gen_undirected_connected_graph_no_bridge_no_articulation_point(nb_nodes, nb_edges):
- # TODO by Nguyen Ngoc Tuan Anh
- 
- G = Graph(nb_nodes)
- return G  
+    # by Nguyen Ngoc Tuan Anh
+    # Algorithm: Open Ear Decomposition. O(V+E).
+    # Biconnected ⟺ no articulation point ⟹ no bridge (same as no-AP task).
+    return generate_biconnected_graph(nb_nodes, nb_edges)
  
 def gen_undirected_connected_graph_nb_bridges(nb_nodes, nb_edges, nb_bridges):
     return generate_undirected_connected_graph_nb_bridges(nb_nodes, nb_edges, nb_bridges)
@@ -89,14 +90,15 @@ def gen_connected_bipartite_graph(nb_left_nodes, nb_right_nodes,nb_edges):
 
 # undirected trees
 def gen_undirected_tree(nb_nodes):
- # TODO by Nguyen Ngoc Tuan Anh    
- G = Graph(nb_nodes)
- return G  
+    # by Nguyen Ngoc Tuan Anh
+    # Algorithm: Prüfer Sequence Decode — uniform distribution over V^(V-2) trees.
+    # O(V log V).
+    return generate_undirected_tree(nb_nodes)
 
 def gen_undirected_tree_bounded_diameter_degree(nb_nodes, ub_deg, ub_diameter):
- # TODO by Nguyen Ngoc Tuan Anh 
- G = Graph(nb_nodes)
- return G  
+    # by Nguyen Ngoc Tuan Anh
+    # Algorithm: Center-Rooted BFS Layer Growth. O(V).
+    return generate_undirected_tree_bounded_diameter_degree(nb_nodes, ub_deg, ub_diameter)
 
 def gen_undirected_tree_diameter_between_P_and_Q_and_degree_at_most_D(n, p, q, d):
     gen = UndirectedTreeDiameterBetweenPandQAndDegreeAtMostDGenerator()
