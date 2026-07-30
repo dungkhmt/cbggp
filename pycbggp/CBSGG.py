@@ -21,7 +21,12 @@ Problems: generate a subgraph/subtree of a given graph with some properties:
 #  def toStr(self):
 #   return '' + str(self.id)
 
-
+class Point2D:
+  def __init__(self,id,x, y):
+    self.id = id  
+    self.x = x 
+    self.y = y    
+    
 class Edge:
   def __init__(self, fromNode: int, toNode: int, id: int, weight: int = 0, offset: int = 0, used: int = 1):
     self.fromNode = fromNode

@@ -1,4 +1,4 @@
-from CBSGG import Graph,DirectedGraph
+from CBSGG import Graph,DirectedGraph, Point2D
 from Geometry import Point
 from Delaunay import Delaunay
 from DSU import DSU
@@ -27,6 +27,25 @@ from constructivemethods.constrained_graph import (
     verify_graph,
 )
 
+def gen_connected_planar_graph(points: List[Point2D], nb_edges):
+    nb_nodes = len(points)
+    # generate an undirected connected planar graph containing nb_nodes and nb_edges, nodes are located at points 
+    # use convex hull comptation
+    # TODO by Le Minh Tuan 
+    G = Graph(nb_nodes, nb_edges)
+    return G 
+
+    
+def gen_connected_planar_graph_with_bridges(points: List[Point2D], nb_edges, nb_bridges):
+    nb_nodes = len(points)
+    # generate an undirected connected planar graph containing nb_nodes and nb_edges, nodes are located at points 
+    # containing nb_bridges 
+    # TODO by Nguyen Phuc Khanh 
+    G = Graph(nb_nodes, nb_edges)
+    return G 
+    
+
+    
 # undirected graphs
 def gen_undirected_graph(nb_nodes, nb_edges, nb_connected_components,
                         nb_bridges, nb_articulation_points,
