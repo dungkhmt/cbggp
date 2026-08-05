@@ -102,6 +102,8 @@ def gen_connected_planar_graph(points, nb_edges):
     if n == 0: return None if nb_edges > 0 else Graph(0) 
     if n == 1: return Graph(1) if nb_edges == 0 else None
 
+    id_to_idx = {p.id: idx for idx, p in enumerate(points)}
+
     def cross(A, B, C):
         return (B.x - A.x) * (C.y - A.y) - (C.x - A.x) * (B.y - A.y)
 
@@ -207,19 +209,21 @@ def gen_connected_planar_graph(points, nb_edges):
 
     G = Graph(n)
     for u, v in final_edges:
-        G.AddEdge(u.id, v.id)
+        G.AddEdge(id_to_idx[u.id], id_to_idx[v.id])
         
     return G
+
 
 def plot_graph(G, points):
     if not G: return
     plt.figure(figsize = (8, 6))
-    pos_map = {p.id: (p.x, p.y) for p in points}
+    
+    idx_to_pos = {idx: (p.x, p.y) for idx, p in enumerate(points)}
     
     for e in G.edges:
-        u_id, v_id = e.fromNode, e.toNode
-        if u_id in pos_map and v_id in pos_map:
-            u_pos, v_pos = pos_map[u_id], pos_map[v_id]
+        u_idx, v_idx = e.fromNode, e.toNode
+        if u_idx in idx_to_pos and v_idx in idx_to_pos:
+            u_pos, v_pos = idx_to_pos[u_idx], idx_to_pos[v_idx]
             plt.plot([u_pos[0], v_pos[0]], [u_pos[1], v_pos[1]], 'b-', alpha=0.6)
             
     x_coords, y_coords = [p.x for p in points], [p.y for p in points]
@@ -235,12 +239,12 @@ def plot_graph(G, points):
     plt.show()
 
 if __name__ == "__main__":
-    points = [
-        Point2D(0, 0.0, 0.0), Point2D(1, 10.0, 0.0), Point2D(2, 5.0, 10.0),
-        Point2D(3, 5.0, 0.00000001),
-        Point2D(4, 5.0, 5.0)
-    ]
-    target_edges = 9
+    # points = [
+    #     Point2D(0, 0.0, 0.0), Point2D(1, 10.0, 0.0), Point2D(2, 5.0, 10.0),
+    #     Point2D(3, 5.0, 0.00000001),
+    #     Point2D(4, 5.0, 5.0)
+    # ]
+    # target_edges = 9
 
     # points = [
     #     Point2D(0, 0.0, 10.0), Point2D(1, 10.0, 0.0), 
@@ -252,6 +256,13 @@ if __name__ == "__main__":
     #     Point2D(8, 0.0, 0.0)
     # ]
     # target_edges = 20
+
+    points = [
+        Point2D(10, 0.0, 0.0), Point2D(55, 10.0, 0.0), Point2D(99, 5.0, 10.0),
+        Point2D(105, 5.0, 0.00000001),
+        Point2D(202, 5.0, 5.0)
+    ]
+    target_edges = 9
 
     G = gen_connected_planar_graph(points, target_edges) 
     
