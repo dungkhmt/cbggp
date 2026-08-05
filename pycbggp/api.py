@@ -26,14 +26,26 @@ from constructivemethods.constrained_graph import (
     generate_constructive, tarjan_analysis, check_feasibility as check_feasibility_vecba,
     verify_graph,
 )
+from constructivemethods.connected_undirected_planar_generator import gen_connected_planar_graph
 
-def gen_connected_planar_graph(points: List[Point2D], nb_edges):
-    nb_nodes = len(points)
-    # generate an undirected connected planar graph containing nb_nodes and nb_edges, nodes are located at points 
-    # use convex hull comptation
-    # TODO by Le Minh Tuan 
-    G = Graph(nb_nodes, nb_edges)
-    return G 
+def gen_connected_planar_graph(points: list[Point2D], nb_edges):
+    """ Done by lmToT27!!!
+        Step 1: Use Graham Scan to generate convex-hull layers, (allow collinear points on a convex hull).
+            We can claim that theres at least V - 1 and at most 3V - k - 3 egdes of a connected planar graph (k is number of points on the outermost layer).
+        Step 2: Add edges between 2 adjacent points on every layer.
+        Step 3:
+        Triangulate the space between two adjacent layers (Outer 'O' and Inner 'I').
+            - Rotate the Outer layer to align its starting point with the Inner layer.
+            - Sort points in both layers by polar angle with respect to the center point of the Inner layer.
+            - We sweep using 2 pointers to determine the next edge to add, try to select closest pair of points from 2 layers.
+            - Validate the chosen diagonal using the cross product to strictly prevent collinear or overlapping triangles.
+        Step 4: In the innermost layer, triagulate by adding edges following a "zig-zag" pattern or something like so.
+        Final step is easy we can use kruskal's algorithm to add edges until we reach the desired number of edges.
+        Time complexity: O(|V|^2) for convex hull generation, O(|V|log|V|) for triangulation, O(|E|log|E|) for kruskal's algorithm.
+        Space complexity: O(|V|) for convex hull generation, O(|V|) for triangulation, O(|E|) for kruskal's algorithm.
+        It can be O(|V|log|V|) for convex hull generation but it doesn't seem like i can implement it TwT.
+    """
+    return gen_connected_planar_graph(points, nb_edges)
 
     
 def gen_connected_planar_graph_with_bridges(points: List[Point2D], nb_edges, nb_bridges):
