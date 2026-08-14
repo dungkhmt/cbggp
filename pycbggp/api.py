@@ -15,6 +15,7 @@ from heuristicmethods.bipartitegraph import generate_bipartite_graph
 from heuristicmethods.connectedbipartitegraph import generate_connected_bipartite_graph
 from heuristicmethods.directedgraph import generate_directed_graph
 from heuristicmethods.directedstronglyconnectedgraph import generate_directed_strongly_connected_graph
+from heuristicmethods.connected_undirected_planar_graph_with_bridges_generator import generate_connected_planar_graph_with_bridges
 
 # Constructive methods 
 from constructivemethods.undirected_connected_graph import generate_undirected_connected_graph
@@ -27,21 +28,14 @@ from constructivemethods.constrained_graph import (
     verify_graph,
 )
 
-def gen_connected_planar_graph(points: List[Point2D], nb_edges):
-    nb_nodes = len(points)
-    # generate an undirected connected planar graph containing nb_nodes and nb_edges, nodes are located at points 
-    # use convex hull comptation
-    # TODO by Le Minh Tuan 
-    G = Graph(nb_nodes, nb_edges)
-    return G 
 
     
-def gen_connected_planar_graph_with_bridges(points: List[Point2D], nb_edges, nb_bridges):
+def gen_connected_planar_graph_with_bridges(points: list[Point2D], nb_edges, nb_bridges):
     nb_nodes = len(points)
     # generate an undirected connected planar graph containing nb_nodes and nb_edges, nodes are located at points 
     # containing nb_bridges 
     # TODO by Nguyen Phuc Khanh 
-    G = Graph(nb_nodes, nb_edges)
+    G = gen_connected_planar_graph_with_bridges(points, nb_bridges, nb_edges)
     return G 
     
 
