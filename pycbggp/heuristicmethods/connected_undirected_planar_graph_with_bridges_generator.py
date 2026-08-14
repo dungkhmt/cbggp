@@ -283,18 +283,19 @@ def plot_graph(G, points):
     plt.grid(True, linestyle='--', alpha = 0.5)
     plt.show()
 
-if __name__ == "__main__":
-    points = [
-        Point2D(0, 5.5, 10.0), Point2D(1, 10.0, 0.0), 
-        Point2D(2, 0.0, -10.0), Point2D(3, -10.0, 0.0),
+# if __name__ == "__main__":
+    # points = [
+    #     Point2D(0, 5.5, 10.0), Point2D(1, 10.0, 0.0), 
+    #     Point2D(2, 0.0, -10.0), Point2D(3, -10.0, 0.0),
         
-        Point2D(4, 3.0, 3.0), Point2D(5, 3.0, -3.0), 
-        Point2D(6, -3.0, -3.0), Point2D(7, -3.0, 3.0),
+    #     Point2D(4, 3.0, 3.0), Point2D(5, 3.0, -3.0), 
+    #     Point2D(6, -3.0, -3.0), Point2D(7, -3.0, 3.0),
         
-        Point2D(8, 0.0, 0.0)
-    ]
-    target_edges = 20
-    for _ in range(5):
-        G = generate_connected_planar_graph_with_bridges(points, 13, 3)
-        plot_graph(G, points)
+    #     Point2D(8, 0.0, 0.0)
+    # ]
+    # target_edges = 20
+    # for _ in range(5):
+    #     G = generate_connected_planar_graph_with_bridges(points, 13, 3)
+    #     plot_graph(G, points)
+
     
