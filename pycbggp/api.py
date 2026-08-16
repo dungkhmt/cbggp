@@ -56,7 +56,16 @@ def gen_connected_planar_graph_with_bridges(points: list[Point2D], nb_edges, nb_
     # generate an undirected connected planar graph containing nb_nodes and nb_edges, nodes are located at points 
     # containing nb_bridges 
     # TODO by Nguyen Phuc Khanh 
-    G = generate_connected_planar_graph_with_bridges(points, nb_bridges, nb_edges)
+    ''' Use Combination of heuristic algorithms 
+        Heuristic01: greedy approach by generating a maximum planar graph, 
+         finding MST, adding edges to get exactly expected number of bridges,
+         finally adding edges for get exactly expected number of edges without changing number of bridges.
+        Time complexity:  O(V^2)
+        Works best for graphs with a moderate number of edges and a small number of bridges
+        Heuristic02: greedy approach by using motone chain & spliting core-branch
+        Works best for graphs with a small number of edges and a moderate number of bridges
+    '''
+    G = generate_connected_planar_graph_with_bridges(points, nb_edges, nb_bridges)
     return G 
     
 
