@@ -27,10 +27,10 @@ from constructivemethods.constrained_graph import (
     generate_constructive, tarjan_analysis, check_feasibility as check_feasibility_vecba,
     verify_graph,
 )
-from constructivemethods.connected_undirected_planar_generator import gen_connected_planar_graph
+from constructivemethods.connected_undirected_planar_generator import _gen_connected_planar_graph
 
 
-def gen_connected_planar_graph(points: list[Point2D], nb_edges):
+def gen_connected_planar_graph_given_list_of_point(points: list[Point2D], nb_edges):
     """ Done by lmToT27!!!
         Step 1: Use Graham Scan to generate convex-hull layers, (allow collinear points on a convex hull).
             We can claim that theres at least V - 1 and at most 3V - k - 3 egdes of a connected planar graph (k is number of points on the outermost layer).
@@ -47,10 +47,8 @@ def gen_connected_planar_graph(points: list[Point2D], nb_edges):
         Space complexity: O(|V|) for convex hull generation, O(|V|) for triangulation, O(|E|) for kruskal's algorithm.
         It can be O(|V|log|V|) for convex hull generation but it doesn't seem like i can implement it TwT.
     """
-    return gen_connected_planar_graph(points, nb_edges)
+    return _gen_connected_planar_graph(points, nb_edges)
 
-
-    
 def gen_connected_planar_graph_with_bridges(points: list[Point2D], nb_edges, nb_bridges):
     nb_nodes = len(points)
     # generate an undirected connected planar graph containing nb_nodes and nb_edges, nodes are located at points 

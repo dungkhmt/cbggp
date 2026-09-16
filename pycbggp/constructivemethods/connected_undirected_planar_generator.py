@@ -97,7 +97,7 @@ def connect_layers(O, I, add_edge, cross):
         add_edge(I_rot[i], O_rot[j])
 
 
-def gen_connected_planar_graph(points, nb_edges):
+def _gen_connected_planar_graph(points, nb_edges):
     n = len(points)
     if n == 0: return None if nb_edges > 0 else Graph(0) 
     if n == 1: return Graph(1) if nb_edges == 0 else None
