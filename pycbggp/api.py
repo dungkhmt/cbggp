@@ -28,7 +28,27 @@ from constructivemethods.constrained_graph import (
     verify_graph,
 )
 from constructivemethods.connected_undirected_planar_generator import _gen_connected_planar_graph
+from constructivemethods.planar_network_generator import gen_planar_network as _gen_planar_network
 
+def gen_planar_network(nb_nodes, nb_arcs, W, H):
+    """ Done by lmToT27!!!
+        Step 1: Place node 0 (source) at x=0 and node n-1 (sink) at x=W-1, both vertically centered.
+        Step 2: Spread the remaining n-2 nodes over up to W-2 middle columns, sizes as even as
+            possible, each column's points evenly spaced across the full height H.
+        Step 3: Space the columns themselves evenly across x when there are fewer points than
+            column slots -- keeps the whole layout spacious instead of bunched to one side.
+        Step 4: Between every two adjacent columns (source/sink count as 1-node columns), connect
+            them with a non-crossing "ladder": a two-pointer merge on y that always advances
+            toward whichever side's next point is closer, so the connecting edges never cross.
+            Edges only ever go between adjacent columns, left to right, so every edge already
+            points from a smaller id to a larger one -- no relabeling needed.
+        Step 5: Reject if nb_arcs is outside [n-1, total ladder edges across all column gaps].
+        Step 6: Protect a spanning tree (Kruskal/DSU), then prune down to exactly nb_arcs edges,
+            removing highest-degree / longest-relative-to-average edges first.
+        Time complexity: O(W*H) to lay out points, O(E log E) for pruning.
+        Space complexity: O(W*H + |V| + |E|).
+    """
+    return _gen_planar_network(nb_nodes, nb_arcs, W, H)
 
 def gen_connected_planar_graph_given_list_of_point(points: list[Point2D], nb_edges):
     """ Done by lmToT27!!!
