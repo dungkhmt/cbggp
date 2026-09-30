@@ -1,4 +1,4 @@
-from CBSGG import Graph,DirectedGraph, Point2D
+from CBSGG import Graph,DirectedGraph, Point2D, RootedTree
 from Geometry import Point
 from Delaunay import Delaunay
 from DSU import DSU
@@ -30,6 +30,14 @@ from constructivemethods.constrained_graph import (
 from constructivemethods.connected_undirected_planar_generator import _gen_connected_planar_graph
 from constructivemethods.planar_network_generator import gen_planar_network as _gen_planar_network
 
+
+def gen_degree_high_constrained_rooted_tree(nbNodes, height, maxDegree):
+    # generate a rooted tree having nbNodes, height, each node has at most maxDegree children
+    # todo by Hoang Minh Tuan
+    
+    t = RootedTree(1)
+    return t 
+    
 def gen_planar_network(nb_nodes, nb_arcs, W, H):
     """ Done by lmToT27!!!
         Step 1: Place node 0 (source) at x=0 and node n-1 (sink) at x=W-1, both vertically centered.
@@ -206,11 +214,17 @@ def test2():
     G3.Print()
     G = G1.union_two_graphs(G1,G3)
     G.Print()
-    
+   
+def test3():
+    G = gen_undirected_tree(10)
+    G.SaveToFile('tree.txt')
+ 
+test3()
+ 
 #test1()
-test2()
-G = generate_directed_strongly_connected_graph(4, 10)
-G.Print()    
+#test2()
+#G = generate_directed_strongly_connected_graph(4, 10)
+#G.Print()    
 
 
 # G = gen_undirected_connected_graph_nb_bridges(7, 8, 2)

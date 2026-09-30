@@ -497,6 +497,17 @@ class DirectedGraph(Graph):
     return G
 
 
+class RootedTree:
+    # todo by Chi Vi
+    def __init__(self, root: int):
+        self.root = root 
+    def add_child(self, parent_node: int, new_node:int):
+        # create a new_node, add the the end of children list of parent_node 
+        return 
+    # add other neccessary functionalities        
+    def print(self):
+        return 
+        
 class SubGraphGenerator:
   def __init__(self, G):
     self.G = G
