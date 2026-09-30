@@ -15,7 +15,7 @@ from heuristicmethods.bipartitegraph import generate_bipartite_graph
 from heuristicmethods.connectedbipartitegraph import generate_connected_bipartite_graph
 from heuristicmethods.directedgraph import generate_directed_graph
 from heuristicmethods.directedstronglyconnectedgraph import generate_directed_strongly_connected_graph
-from heuristicmethods.connected_undirected_planar_graph_with_bridges_generator import generate_connected_planar_graph_with_bridges
+from heuristicmethods.connected_undirected_planar_graph_with_bridges_generator import gen_graph
 
 # Constructive methods 
 from constructivemethods.undirected_connected_graph import generate_undirected_connected_graph
@@ -77,21 +77,28 @@ def gen_connected_planar_graph_given_list_of_point(points: list[Point2D], nb_edg
     """
     return _gen_connected_planar_graph(points, nb_edges)
 
-def gen_connected_planar_graph_with_bridges(points: list[Point2D], nb_edges, nb_bridges):
-    nb_nodes = len(points)
-    # generate an undirected connected planar graph containing nb_nodes and nb_edges, nodes are located at points 
-    # containing nb_bridges 
-    # TODO by Nguyen Phuc Khanh 
-    ''' Use Combination of heuristic algorithms 
-        Heuristic01: greedy approach by generating a maximum planar graph, 
-         finding MST, adding edges to get exactly expected number of bridges,
-         finally adding edges for get exactly expected number of edges without changing number of bridges.
-        Time complexity:  O(V^2)
-        Works best for graphs with a moderate number of edges and a small number of bridges
-        Heuristic02: greedy approach by using motone chain & spliting core-branch
-        Works best for graphs with a small number of edges and a moderate number of bridges
-    '''
-    G = generate_connected_planar_graph_with_bridges(points, nb_edges, nb_bridges)
+def gen_connected_planar_graph_with_bridges(nb_nodes, nb_edges, nb_bridges, Width = 100, Height = 100):
+    """TODO: Implement by Nguyen Phuc Khanh
+    Objective:
+        Generate a random undirected, connected planar graph embedded in a 2D integer grid.
+
+    Parameters:
+        nb_nodes (int): The total number of vertices (nodes) in the graph.
+        nb_edges (int): The total number of edges in the graph.
+        nb_bridges (int): The exact number of bridge edges (cut-edges) required.
+        Width (int): The maximum bound for the X-axis coordinate [0, Width].
+        Height (int): The maximum bound for the Y-axis coordinate [0, Height].
+
+    Constraints & Requirements:
+        1. Connected: The graph must consist of a single connected component.
+        2. Planar Embedding: Edges drawn as straight-line segments between vertices must not intersect except at shared endpoints.
+        3. Bridge Count: Exactly `nb_bridges` edges whose removal increases the number of connected components.
+        4. Integer Coordinates: Each vertex must be assigned a unique integer coordinate (x, y) such that 0 <= x <= Width and 0 <= y <= Height.
+
+    Returns:
+        G: A graph object containing the generated vertices with coordinate attributes and edges.
+    """
+    G = gen_graph(nb_nodes, nb_edges, nb_bridges, Width, Height)
     return G 
     
 
