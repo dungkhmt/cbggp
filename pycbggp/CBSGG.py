@@ -499,14 +499,204 @@ class DirectedGraph(Graph):
 
 class RootedTree:
     # todo by Chi Vi
+    """A small weighted rooted tree.
+    Edges are undirected and represented as ``(u, v, weight)``.  The root is
+    used only to determine parent/child relationships; all distances use the
+    supplied edge weights.
+    """
+
     def __init__(self, root: int):
-        self.root = root 
-    def add_child(self, parent_node: int, new_node:int):
-        # create a new_node, add the the end of children list of parent_node 
-        return 
-    # add other neccessary functionalities        
+        self.root = root
+        self.edges = []
+        self._adj = {root: {}}
+
+    @staticmethod
+    def _edge_parts(edge, weight=None):
+        if weight is not None:
+            if len(edge) != 2:
+                return None
+            u, v = edge
+            return u, v, weight
+        if len(edge) == 2:
+            return edge[0], edge[1], 1
+        if len(edge) == 3:
+            return edge[0], edge[1], edge[2]
+        return None
+
+    def _check_weight(self, weight):
+        if not isinstance(weight, (int, float)):
+            raise TypeError("edge weight must be a number")
+        if weight < 0:
+            return False
+        return True
+
+    def _has_edge(self, u, v):
+        return u in self._adj and v in self._adj[u]
+
+    def addEdge(self, edge, weight=None):
+        """Add a leaf edge and return ``True``.
+        Exactly one endpoint must already belong to the tree.  This keeps the
+        object a rooted tree without needing a general graph connectivity
+        check.
+        """
+        parts = self._edge_parts(edge, weight)
+        if parts is None:
+            return
+        u, v, edge_weight = parts
+        if not self._check_weight(edge_weight):
+            return
+        if u == v:
+            return
+        if self._has_edge(u, v):
+            return
+        u_exists = u in self._adj
+        v_exists = v in self._adj
+        if u_exists == v_exists:
+            return
+
+        self._adj.setdefault(u, {})[v] = edge_weight
+        self._adj.setdefault(v, {})[u] = edge_weight
+        self.edges.append((u, v, edge_weight))
+        return True
+
+    def add_child(self, parent_node: int, new_node: int, weight=1):
+        return self.addEdge((parent_node, new_node), weight)
+
+    def RemoveEdge(self, edge, weight=None):
+        """Remove a leaf edge and return ``True``.
+        Removing an internal edge would split the tree, so it is rejected.
+        The weight is ignored when matching an existing edge.
+        """
+        parts = self._edge_parts(edge, weight)
+        if parts is None:
+            return
+        u, v, _ = parts
+        if not self._has_edge(u, v):
+            return
+        if len(self._adj[u]) > 1 and len(self._adj[v]) > 1:
+            return
+
+        del self._adj[u][v]
+        del self._adj[v][u]
+        if not self._adj[u] and u != self.root:
+            del self._adj[u]
+        if not self._adj[v] and v != self.root:
+            del self._adj[v]
+        self.edges.remove(next(e for e in self.edges
+                               if {e[0], e[1]} == {u, v}))
+        return True
+
+    def ReplaceEdge(self, edge_in, edge_out):
+        #Replace one leaf edge with another edge, preserving the tree.
+        in_parts = self._edge_parts(edge_in)
+        out_parts = self._edge_parts(edge_out)
+        if in_parts is None or out_parts is None:
+            return
+        u, v, new_weight = in_parts
+        old_u, old_v, _ = out_parts
+        if not self._has_edge(old_u, old_v):
+            return
+        if len(self._adj[old_u]) > 1 and len(self._adj[old_v]) > 1:
+            return
+        if self.addEdge((u, v, new_weight)) is None:
+            return
+        self.RemoveEdge((old_u, old_v))
+        return True
+
+    def _rooted_distances(self):
+        distances = {self.root: 0}
+        parent = {self.root: None}
+        stack = [self.root]
+        while stack:
+            node = stack.pop()
+            for child, weight in self._adj[node].items():
+                if child == parent[node]:
+                    continue
+                parent[child] = node
+                distances[child] = distances[node] + weight
+                stack.append(child)
+        return distances, parent
+
+    def _rooted_depths(self):
+        depths = {self.root: 0}
+        parent = {self.root: None}
+        stack = [self.root]
+        while stack:
+            node = stack.pop()
+            for child in self._adj[node]:
+                if child == parent[node]:
+                    continue
+                parent[child] = node
+                depths[child] = depths[node] + 1
+                stack.append(child)
+        return depths
+
+    def height(self):
+        #Return the maximum number of edges from root to any node.
+        return max(self._rooted_depths().values())
+
+    def weighted_height(self):
+        #Return the maximum weighted distance from root to any node.
+        return max(self._rooted_distances()[0].values())
+
+    def diameter(self):
+        #Return the maximum weighted distance between any two nodes.
+        if len(self._adj) <= 1:
+            return 0
+
+        def farthest(start):
+            distances = {start: 0}
+            stack = [start]
+            parent = {start: None}
+            while stack:
+                node = stack.pop()
+                for neighbour, weight in self._adj[node].items():
+                    if neighbour == parent[node]:
+                        continue
+                    parent[neighbour] = node
+                    distances[neighbour] = distances[node] + weight
+                    stack.append(neighbour)
+            return max(distances.items(), key=lambda item: item[1])
+
+        endpoint, _ = farthest(self.root)
+        return farthest(endpoint)[1]
+
+    def number_of_children(self, node):
+        _, parent = self._rooted_distances()
+        if node not in self._adj:
+            return
+        return sum(child != parent[node] for child in self._adj[node])
+
+    def subtree_size(self, node):
+        distances, parent = self._rooted_distances()
+        if node not in distances:
+            return
+        return sum(
+            1 for candidate in distances
+            if candidate == node or self._is_descendant(candidate, node, parent)
+        )
+
+    @staticmethod
+    def _is_descendant(node, ancestor, parent):
+        while parent[node] is not None:
+            node = parent[node]
+            if node == ancestor:
+                return True
+        return False
+
+    # Readable aliases for callers using snake_case.
+    add_edge = addEdge
+    remove_edge = RemoveEdge
+    replace_edge = ReplaceEdge
+    get_height = height
+    get_weighted_height = weighted_height
+    get_diameter = diameter
+    count_children = number_of_children
+    count_subtree_nodes = subtree_size
+
     def print(self):
-        return 
+        for edge in self.edges:
+            print(edge)
         
 class SubGraphGenerator:
   def __init__(self, G):
@@ -598,7 +788,7 @@ class VarPath:
     self.t = t
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and False:
   connected = 'Y'
   nbNodes = 0
   nbEdges = 0
@@ -666,3 +856,51 @@ if __name__ == "__main__":
 # G1.AddEdge(1,3)
 # G1.AddEdge(2,4)
 # G1.Print()
+
+
+# Chi Vi
+def test_rooted_tree():
+  tree = RootedTree(0)
+
+  # Add edges and verify the basic tree structure.
+  assert tree.addEdge((0, 1, 2)) is True
+  assert tree.addEdge((0, 2, 3)) is True
+  assert tree.addEdge((1, 3, 4)) is True
+  assert tree.edges == [(0, 1, 2), (0, 2, 3), (1, 3, 4)]
+
+  # Rooted metrics.
+  assert tree.height() == 2
+  assert tree.weighted_height() == 6
+  assert tree.diameter() == 9
+  assert tree.number_of_children(0) == 2
+  assert tree.number_of_children(1) == 1
+  assert tree.number_of_children(3) == 0
+  assert tree.subtree_size(0) == 4
+  assert tree.subtree_size(1) == 2
+  assert tree.subtree_size(3) == 1
+
+  # Snake_case aliases and add_child.
+  assert tree.add_child(2, 4, 1) is True
+  assert tree.get_height() == 2
+  assert tree.get_weighted_height() == 6
+  assert tree.count_children(2) == 1
+  assert tree.count_subtree_nodes(2) == 2
+
+  # Replace a leaf edge and verify that its new weight is used.
+  assert tree.ReplaceEdge((1, 5, 5), (1, 3, 4)) is True
+  assert (1, 3, 4) not in tree.edges
+  assert (1, 5, 5) in tree.edges
+  assert tree.get_height() == 2
+  assert tree.get_weighted_height() == 7
+  assert tree.get_diameter() == 11
+
+  # Remove a leaf edge.
+  assert tree.RemoveEdge((1, 5, 5)) is True
+  assert tree.remove_edge((2, 4, 1)) is True
+  assert tree.edges == [(0, 1, 2), (0, 2, 3)]
+
+  print("RootedTree: all tests passed")
+
+
+if __name__ == "__main__":
+  test_rooted_tree()
