@@ -31,12 +31,55 @@ from constructivemethods.connected_undirected_planar_generator import _gen_conne
 from constructivemethods.planar_network_generator import gen_planar_network as _gen_planar_network
 
 
-def gen_degree_high_constrained_rooted_tree(nbNodes, height, maxDegree):
-    # generate a rooted tree having nbNodes, height, each node has at most maxDegree children
-    # todo by Hoang Minh Tuan
+def gen_degree_high_constrained_rooted_tree(nbNodes, height, maxDegree, root = 1, default_weight = 1):
+    """
+    Generate a rooted tree having nbNodes, height, where each node has at most maxDegree children.
+    todo by Hoang Minh Tuan
+
+    """
     
-    t = RootedTree(1)
-    return t 
+    tree = RootedTree(root)
+
+    # Prepare node
+    all_nodes = [root + i for i in range(nbNodes)]
+    other_nodes = [u for u in all_nodes if u != root]
+    random.shuffle(other_nodes)
+
+    depth = {root: 0}
+    children_count = {root: 0}
+
+    # Guarantee exact tree height
+    spine_nodes = [root] + other_nodes[:height]
+    for i in range(height):
+        p, c = spine_nodes[i], spine_nodes[i + 1]
+        tree.add_child(p, c, default_weight)
+        children_count[p] = children_count.get(p, 0) + 1
+        children_count[c] = 0
+        depth[c] = i + 1
+
+    # Pool of available parents
+    eligible_parents = []
+    for u in spine_nodes[:-1]:
+        if children_count[u] < maxDegree:
+            eligible_parents.append(u)
+
+    # Attach remaining nodes to randomly eligible parents
+    for v in other_nodes[height:]:
+        idx = random.randrange(len(eligible_parents))
+        p = eligible_parents[idx]
+        tree.add_child(p, v, default_weight)
+        children_count[p] += 1
+        if children_count[p] == maxDegree:
+            eligible_parents[idx] = eligible_parents[-1]
+            eligible_parents.pop()
+
+        d = depth[p] + 1
+        depth[v] = d
+        children_count[v] = 0
+        if d < height and maxDegree > 0:
+            eligible_parents.append(v)
+
+    return tree
     
 def gen_planar_network(nb_nodes, nb_arcs, W, H):
     """ Done by lmToT27!!!
@@ -226,6 +269,7 @@ def test3():
     G = gen_undirected_tree(10)
     G.SaveToFile('tree.txt')
  
+
 test3()
  
 #test1()
